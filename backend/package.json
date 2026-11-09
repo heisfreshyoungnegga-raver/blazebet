@@ -1,0 +1,17 @@
+{
+  "name": "blizbet-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BlizBet backend - auth, wallet ledger, odds & game algorithms, bets, casino, admin",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/run.js && node test/run2.js && node test/run3.js && node test/run4.js",
+    "test:pg": "node test/pg-run.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}
