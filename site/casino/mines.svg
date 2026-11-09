@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <defs>
+    <linearGradient id="mines-bg" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="0.5" stop-color="#2456a8"/>
+      <stop offset="1" stop-color="#1e3a6e"/>
+    </linearGradient>
+    <radialGradient id="mines-glow" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0" stop-color="#7cb3ff" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#7cb3ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mines-btm" x1="0" y1="0.62" x2="0" y2="1">
+      <stop offset="0" stop-color="#132444" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0d1a33" stop-opacity="0.92"/>
+    </linearGradient>
+    <radialGradient id="mines-gemtop" cx="0.42" cy="0.3" r="0.75">
+      <stop offset="0" stop-color="#bbf7d0"/>
+      <stop offset="0.55" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#15803d"/>
+    </radialGradient>
+    <linearGradient id="mines-fac1" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#d1fae5"/>
+      <stop offset="1" stop-color="#4ade80"/>
+    </linearGradient>
+    <linearGradient id="mines-fac2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee7a8"/>
+      <stop offset="1" stop-color="#16a34a"/>
+    </linearGradient>
+    <linearGradient id="mines-fac3" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#166534"/>
+    </linearGradient>
+    <linearGradient id="mines-fac4" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#15803d"/>
+      <stop offset="1" stop-color="#0b5027"/>
+    </linearGradient>
+    <linearGradient id="mines-crown" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ecfdf5"/>
+      <stop offset="1" stop-color="#6ee7a8"/>
+    </linearGradient>
+    <radialGradient id="mines-spark" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mines-bomb" cx="0.36" cy="0.32" r="0.8">
+      <stop offset="0" stop-color="#5b6472"/>
+      <stop offset="0.45" stop-color="#2a2f3a"/>
+      <stop offset="1" stop-color="#101319"/>
+    </radialGradient>
+    <radialGradient id="mines-fuse" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#fff7cc"/>
+      <stop offset="0.4" stop-color="#ffb020"/>
+      <stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="mines-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+
+  <rect width="300" height="400" fill="url(#mines-bg)"/>
+  <rect width="300" height="400" fill="url(#mines-glow)"/>
+
+  <!-- faint 5x5 mines board motif -->
+  <g opacity="0.12" fill="none" stroke="#cfe3ff" stroke-width="3">
+    <rect x="52" y="82" width="40" height="40" rx="9"/>
+    <rect x="100" y="82" width="40" height="40" rx="9"/>
+    <rect x="148" y="82" width="40" height="40" rx="9"/>
+    <rect x="196" y="82" width="40" height="40" rx="9"/>
+    <rect x="52" y="130" width="40" height="40" rx="9"/>
+    <rect x="196" y="130" width="40" height="40" rx="9"/>
+    <rect x="52" y="178" width="40" height="40" rx="9"/>
+    <rect x="196" y="178" width="40" height="40" rx="9"/>
+    <rect x="52" y="226" width="40" height="40" rx="9"/>
+    <rect x="100" y="226" width="40" height="40" rx="9"/>
+    <rect x="148" y="226" width="40" height="40" rx="9"/>
+    <rect x="196" y="226" width="40" height="40" rx="9"/>
+  </g>
+
+  <!-- decorative sparkles -->
+  <g fill="#e6f0ff">
+    <circle cx="62" cy="70" r="3" opacity="0.35"/>
+    <circle cx="238" cy="120" r="2.5" opacity="0.3"/>
+    <circle cx="70" cy="250" r="2.5" opacity="0.25"/>
+    <circle cx="232" cy="230" r="3" opacity="0.3"/>
+  </g>
+
+  <!-- gem drop shadow -->
+  <ellipse cx="152" cy="262" rx="66" ry="20" fill="#0a152b" opacity="0.55" filter="url(#mines-soft)"/>
+
+  <!-- HERO gem, rotated ~8deg -->
+  <g transform="rotate(8 150 175)">
+    <!-- crown/table top band -->
+    <path d="M96 132 L150 118 L204 132 L186 152 L114 152 Z" fill="url(#mines-crown)"/>
+    <path d="M114 152 L186 152 L172 168 L128 168 Z" fill="url(#mines-fac1)"/>
+    <!-- table facets -->
+    <path d="M96 132 L114 152 L128 168 L106 176 L88 150 Z" fill="url(#mines-fac2)"/>
+    <path d="M204 132 L186 152 L172 168 L196 176 L214 150 Z" fill="url(#mines-fac3)"/>
+    <!-- main body pavilion -->
+    <path d="M88 150 L106 176 L150 246 L88 176 Z" fill="url(#mines-fac2)"/>
+    <path d="M214 150 L196 176 L150 246 L214 176 Z" fill="url(#mines-fac4)"/>
+    <path d="M106 176 L172 168 L128 168 L150 246 Z" fill="url(#mines-fac1)"/>
+    <path d="M128 168 L172 168 L196 176 L150 246 Z" fill="url(#mines-fac3)"/>
+    <path d="M106 176 L128 168 L150 246 Z" fill="url(#mines-fac2)"/>
+    <path d="M172 168 L196 176 L150 246 Z" fill="url(#mines-fac4)"/>
+    <!-- overall glossy top wash -->
+    <path d="M96 132 L150 118 L204 132 L214 150 L196 176 L172 168 L128 168 L106 176 L88 150 Z" fill="url(#mines-gemtop)" opacity="0.32"/>
+    <!-- specular sparkles -->
+    <ellipse cx="128" cy="140" rx="20" ry="8" fill="url(#mines-spark)" opacity="0.85"/>
+    <circle cx="118" cy="150" r="4" fill="#ffffff"/>
+    <circle cx="164" cy="200" r="3" fill="#ffffff" opacity="0.8"/>
+    <path d="M150 210 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 z" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- ACCENT bomb behind upper-left of gem -->
+  <ellipse cx="86" cy="150" rx="30" ry="9" fill="#0a152b" opacity="0.4" filter="url(#mines-soft)"/>
+  <g>
+    <!-- fuse -->
+    <path d="M96 106 q10 -14 22 -12" fill="none" stroke="#3a2a12" stroke-width="4" stroke-linecap="round"/>
+    <!-- spark glow -->
+    <circle cx="120" cy="92" r="16" fill="url(#mines-fuse)"/>
+    <path d="M120 82 l2.5 7 l7 2.5 l-7 2.5 l-2.5 7 l-2.5 -7 l-7 -2.5 l7 -2.5 z" fill="#ffdf6e"/>
+    <circle cx="120" cy="92" r="3" fill="#fff7d6"/>
+    <!-- bomb body -->
+    <circle cx="82" cy="118" r="26" fill="url(#mines-bomb)"/>
+    <ellipse cx="73" cy="108" rx="9" ry="6" fill="#8b95a6" opacity="0.55"/>
+    <circle cx="72" cy="106" r="3.5" fill="#dfe6f0" opacity="0.8"/>
+    <!-- red band accent -->
+    <path d="M60 128 q22 12 44 -2" fill="none" stroke="#e11d2a" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="97" cy="99" r="4" fill="#1a1d24"/>
+  </g>
+
+  <!-- bottom darkening for game-name overlay -->
+  <rect width="300" height="400" fill="url(#mines-btm)"/>
+</svg>

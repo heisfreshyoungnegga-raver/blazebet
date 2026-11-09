@@ -1,0 +1,8 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t">
+  <title id="t">BlazeBet</title>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="#171122"/>
+  <g transform="translate(16 0) skewX(-8)">
+    <path fill="#F8F7FB" fill-rule="evenodd" d="M74 52 H148 A36 36 0 0 1 184 88 V118 L196 130 V166 A38 38 0 0 1 158 204 H74 Z M108 84 H142 A15 15 0 0 1 157 99 V103 A15 15 0 0 1 142 118 H108 Z M108 140 H150 A15 15 0 0 1 165 155 V159 A15 15 0 0 1 150 174 H108 Z"/>
+    <rect x="56" y="146" width="142" height="22" fill="#8B5CF6"/>
+  </g>
+</svg>
