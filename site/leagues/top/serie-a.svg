@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="37.3 37.8 186.4 216.15"><style id="style833" type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#0032A0;}
+	.st2{fill:#C8102E;}
+	.st3{fill:#00B74F;}
+	.st4{fill:#E4002B;}
+	.st5{fill:#1A1659;}
+	.st6{fill:url(#SVGID_1_);}
+	.st7{fill:url(#SVGID_2_);}
+</style>
+<g transform="matrix(0.92616116,0,0,0.92616116,0.04630987,1.1093283)" id="g915">
+	<g id="g898">
+		<g id="g896">
+			<g id="g894">
+				<polygon id="polygon873" points="40.5,209.2 101.9,209.2 140.8,272.8 " class="st5" />
+				<polygon id="polygon875" points="241.2,209.2 179.7,209.2 140.8,272.8 " class="st5" />
+				<polygon id="polygon877" points="101.9,209.2 140.8,209.2 179.7,209.2 140.8,106.5 " class="st5" />
+				<linearGradient y2="240.95979" x2="179.7025" y1="240.95979" x1="101.9403" gradientUnits="userSpaceOnUse" id="SVGID_1_">
+					<stop id="stop879" style="stop-color:#31ECFF" offset="0" />
+					<stop id="stop881" style="stop-color:#2DE2FF" offset="4.937099e-02" />
+					<stop id="stop883" style="stop-color:#1BB2FF" offset="0.2964" />
+					<stop id="stop885" style="stop-color:#0E90FF" offset="0.5147" />
+					<stop id="stop887" style="stop-color:#067BFF" offset="0.694" />
+					<stop id="stop889" style="stop-color:#0373FF" offset="0.8118" />
+				</linearGradient>
+				<polygon style="fill:url(#SVGID_1_)" id="polygon892" points="140.8,272.8 179.7,209.2 101.9,209.2 " class="st6" />
+			</g>
+		</g>
+	</g>
+	<linearGradient y2="241.42371" x2="129.11411" y1="50.923302" x1="198.45061" gradientUnits="userSpaceOnUse" id="SVGID_2_">
+		<stop id="stop900" style="stop-color:#31ECFF" offset="0" />
+		<stop id="stop902" style="stop-color:#2DE2FF" offset="4.882737e-02" />
+		<stop id="stop904" style="stop-color:#1BB2FF" offset="0.2932" />
+		<stop id="stop906" style="stop-color:#0E90FF" offset="0.5091" />
+		<stop id="stop908" style="stop-color:#067BFF" offset="0.6863" />
+		<stop id="stop910" style="stop-color:#0373FF" offset="0.8028" />
+	</linearGradient>
+	<path style="fill:url(#SVGID_2_)" id="path913" d="m 140.8,106.5 16.8,44.3 H 136.4 L 122,189 h 50.1 l 7.6,20.2 h 61.5 L 168.5,40 c -18.5,0 -36.9,0 -55.4,0 L 40.5,209.2 H 102 Z" class="st7" />
+</g>
+</svg>
