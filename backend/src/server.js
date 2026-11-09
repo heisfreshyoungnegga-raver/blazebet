@@ -14,8 +14,8 @@ const toMinor = (ghs) => Math.round(parseFloat(ghs) * 100);
 const toGhs = (minor) => minor / 100;
 
 
-const SDK_JS = `// BlizBet API SDK - include with <script src="https://YOUR-API/sdk.js"></script>
-window.BlizBet = (() => {
+const SDK_JS = `// BlazeBet API SDK - include with <script src="https://YOUR-API/sdk.js"></script>
+window.BlazeBet = (() => {
   let base = '', token = localStorage.getItem('bb_token') || '';
   async function call(m, p, body) { const r = await fetch(base + p, { method: m, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) }, body: body ? JSON.stringify(body) : undefined }); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j; }
   return {
@@ -413,10 +413,10 @@ const server = http.createServer((req, res) => {
     const pathOnly = req.url.split('?')[0];
     try {
       for (const [m, re, fn] of routes) { if (req.method !== m) continue; const mm = pathOnly.match(re); if (mm) return await fn(req, res, body, ...mm.slice(1)); }
-      if (pathOnly === '/health') return send(res, 200, { ok: true, service: 'blizbet-backend', db: db.isPG ? 'postgres' : 'sqlite' });
+      if (pathOnly === '/health') return send(res, 200, { ok: true, service: 'blazebet-backend', db: db.isPG ? 'postgres' : 'sqlite' });
       send(res, 404, { error: 'not_found' });
     } catch (e) { console.error('handler error:', e); if (!res.headersSent) send(res, 500, { error: 'internal' }); }
   });
 });
-db.init().then(seedMatches).then(() => server.listen(PORT, () => console.log('BlizBet backend listening on :' + PORT + ' (db: ' + (db.isPG ? 'postgres' : 'sqlite') + ')'))).catch(e => { console.error('boot failed:', e); process.exit(1); });
+db.init().then(seedMatches).then(() => server.listen(PORT, () => console.log('BlazeBet backend listening on :' + PORT + ' (db: ' + (db.isPG ? 'postgres' : 'sqlite') + ')'))).catch(e => { console.error('boot failed:', e); process.exit(1); });
 module.exports = { server };

@@ -1,7 +1,7 @@
-# BlizBet Backend v1 (Phase 1 — built 2026-11-09)
+# BlazeBet Backend v1 (Phase 1 — built 2026-11-09)
 
 Zero-dependency Node.js 24 API. Run: `npm start` (PORT env, default 4180). Test: `npm test`.
-Data: SQLite at data/blizbet.db (BLIZBET_DB env to override). Money is integer pesewas everywhere.
+Data: SQLite at data/blazebet.db (BLAZEBET_DB env to override). Money is integer pesewas everywhere.
 
 ## What's live in v1
 - Auth: register/login (scrypt hashes, bearer sessions). First account = super_admin.
@@ -33,7 +33,7 @@ Data: SQLite at data/blizbet.db (BLIZBET_DB env to override). Money is integer p
   (margin/cashout/stake limits, range-validated), admin stats incl. GGR, admin match creation from
   fair probabilities, VOID results in settlement (payout recomputed without void legs; a fully-void
   ticket refunds the stake).
-- Frontend SDK at GET /sdk.js (window.BlizBet): auth, wallet, bets, instant + session play.
+- Frontend SDK at GET /sdk.js (window.BlazeBet): auth, wallet, bets, instant + session play.
 - Tests: npm test runs Phase 1 + Phase 2 suites (both green, repeated runs stable).
 
 ## Phase 3 (admin power pack, same day)

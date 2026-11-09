@@ -1,4 +1,4 @@
-// BlizBet data layer v2 - one async API, two drivers:
+// BlazeBet data layer v2 - one async API, two drivers:
 //   DATABASE_URL set  -> Postgres (Neon in production)
 //   otherwise         -> SQLite file (local dev + test suites)
 // All SQL in the codebase uses ? placeholders; the PG driver translates to $n.
@@ -32,7 +32,7 @@ if (PG) {
 } else {
   const { DatabaseSync } = require('node:sqlite');
   const path = require('node:path'); const fs = require('node:fs');
-  const file = process.env.BLIZBET_DB || path.join(__dirname, '..', 'data', 'blizbet.db');
+  const file = process.env.BLAZEBET_DB || path.join(__dirname, '..', 'data', 'blazebet.db');
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const sq = new DatabaseSync(file);
   sq.exec('PRAGMA journal_mode = WAL');

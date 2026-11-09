@@ -1,4 +1,4 @@
-# BlizBet — Backend & Algorithms Spec (v1, 2026-11-09)
+# BlazeBet — Backend & Algorithms Spec (v1, 2026-11-09)
 
 ## Architecture
 - Zero-dependency Node.js 24 HTTP API (built-in `node:sqlite`, `node:crypto`). Same code swaps

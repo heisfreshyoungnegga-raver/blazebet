@@ -1,6 +1,6 @@
 // Phase 2 tests: session games, poker evaluator, settings, void settlement, throttle, SDK.
-process.env.BLIZBET_DB = require('node:path').join(__dirname, 'test2.db');
-for (const suf of ['', '-wal', '-shm']) require('node:fs').rmSync(process.env.BLIZBET_DB + suf, { force: true });
+process.env.BLAZEBET_DB = require('node:path').join(__dirname, 'test2.db');
+for (const suf of ['', '-wal', '-shm']) require('node:fs').rmSync(process.env.BLAZEBET_DB + suf, { force: true });
 const assert = require('node:assert');
 const { evaluatePoker, minesMult } = require('../src/sessions');
 const C = (v, s) => ({ v, s });
@@ -77,7 +77,7 @@ console.log('poker/mines unit OK');
   assert.strictEqual((await call('POST', '/api/auth/login', { phone: '+233700000002', password: 'newpass1' })).s, 200);
   // stats + SDK
   const stats = await call('GET', '/api/admin/stats', null, AT); assert(stats.j.users >= 3 && typeof stats.j.ggr === 'number', JSON.stringify(stats.j));
-  const sdk = await (await fetch(base + '/sdk.js')).text(); assert(sdk.includes('window.BlizBet'), 'SDK served');
+  const sdk = await (await fetch(base + '/sdk.js')).text(); assert(sdk.includes('window.BlazeBet'), 'SDK served');
   console.log('phase2 HTTP OK - settings, void refund, mines cashout, hilo, skyclimb, poker, throttle 429, change-password, stats GGR GH₵' + stats.j.ggr);
   console.log('ALL PHASE 2 TESTS PASS');
   process.exit(0);

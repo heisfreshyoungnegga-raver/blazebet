@@ -1,6 +1,6 @@
-// BlizBet backend test suite: unit (odds, crash distribution, wallet) + full HTTP flow.
-process.env.BLIZBET_DB = require('node:path').join(__dirname, 'test.db');
-for (const suf of ['', '-wal', '-shm']) require('node:fs').rmSync(process.env.BLIZBET_DB + suf, { force: true });
+// BlazeBet backend test suite: unit (odds, crash distribution, wallet) + full HTTP flow.
+process.env.BLAZEBET_DB = require('node:path').join(__dirname, 'test.db');
+for (const suf of ['', '-wal', '-shm']) require('node:fs').rmSync(process.env.BLAZEBET_DB + suf, { force: true });
 const assert = require('node:assert');
 const { buildBook, potential, cashoutValue } = require('../src/odds');
 const { floatStream, crashPoint } = require('../src/crypto');
