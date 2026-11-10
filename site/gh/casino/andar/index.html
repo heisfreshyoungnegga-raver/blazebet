@@ -1,24 +1,183 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Andar Bahar | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/andar.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/andar.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Andar Bahar</h1><p class="sub">A joker card is dealt. Bet Andar (inside) or Bahar (outside) - the side that matches the joker's rank first wins.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="stage"><div>Joker<br><b class="big" id="joker" style="font-size:40px">?</b></div><div class="row" style="gap:20px"><span>Andar: <b id="ap">-</b></span><span>Bahar: <b id="bp">-</b></span></div><div class="msg" id="msg">Place your bet to deal the joker.</div></div></div>
-<div class="panel row"><select id="pick"><option value="andar">Andar (1.90x)</option><option value="bahar">Bahar (1.90x)</option></select></div>
-<button class="bet" onclick="play()">DEAL</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Andar Bahar — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.joker-zone{text-align:center}
+.joker-name{font-size:12px;font-weight:800;letter-spacing:.12em;color:#9db9dd;text-transform:uppercase;margin-bottom:8px}
+.joker-zone .gk-card{margin:0 auto;width:66px;height:94px}
+.joker-zone .gk-card .r{font-size:22px}
+.joker-zone .gk-card .big-s{font-size:38px}
+.piles{display:flex;gap:12px;width:100%}
+.pile{flex:1;background:rgba(4,18,46,.35);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;text-align:center;min-height:158px}
+.pile-name{font-size:12px;font-weight:800;letter-spacing:.1em;color:#9db9dd;text-transform:uppercase}
+.pile-name b{display:block;font-size:22px;color:#fff;letter-spacing:0;margin-top:2px}
+.pile.win .pile-name{color:#86efac}
+.pile .gk-card{margin:10px auto 0;width:54px;height:78px}
+.pile .gk-card .r{font-size:17px}
+.pile .gk-card.match{box-shadow:0 0 0 3px #22c55e,0 8px 18px rgba(0,0,0,.45)}
+.pile-empty{margin-top:26px;color:#64809f;font-size:13px;font-weight:700}
+.trail{font-size:11px;color:#64809f;margin-top:8px;min-height:15px;letter-spacing:.06em}
+.pick-row{display:flex;gap:8px;flex-wrap:wrap}
+.pick-row .gk-chip{flex:1;min-width:110px}
+.pick-row .gk-chip:disabled{opacity:.45;cursor:default}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Andar Bahar</h1>
+  <p class="gk-sub">A joker card is drawn, then cards are dealt one at a time &mdash; Andar first, then Bahar &mdash; until a card matches the joker&rsquo;s rank. The side it lands on wins: Andar pays &times;1.9, Bahar pays &times;2.</p>
+
+  <section class="gk-stage has-photo" id="stage">
+    <img class="bg" src="/casino-img/andar.jpg" alt="">
+    <div class="gk-stage-in">
+      <div class="joker-zone">
+        <div class="joker-name">Joker</div>
+        <div id="jokerBox"></div>
+      </div>
+      <div class="piles">
+        <div class="pile" id="pileBoxA">
+          <div class="pile-name">Andar<b id="cntA">0 dealt</b></div>
+          <div id="lastA"><div class="pile-empty">waiting&hellip;</div></div>
+          <div class="trail" id="trailA"></div>
+        </div>
+        <div class="pile" id="pileBoxB">
+          <div class="pile-name">Bahar<b id="cntB">0 dealt</b></div>
+          <div id="lastB"><div class="pile-empty">waiting&hellip;</div></div>
+          <div class="trail" id="trailB"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your bet</div>
+    <div class="pick-row" id="pickRow">
+      <button class="gk-chip on" data-pick="andar">Andar &middot; &times;1.9</button>
+      <button class="gk-chip" data-pick="bahar">Bahar &middot; &times;2</button>
+    </div>
+    <div class="gk-label" style="margin-top:14px">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Pick a side and deal the joker.</div>
+    <button class="gk-bet" id="gkAction">DEAL</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-const names={1:'A',11:'J',12:'Q',13:'K'};const suits=['\u2660','\u2665','\u2666','\u2663'];
-function rc(){return 1+Math.floor(Math.random()*13)}
-function play(){const s=getStake();if(!s)return;const j=rc();$('joker').textContent=(names[j]||j)+suits[Math.floor(Math.random()*4)];
-let side='andar',ac=0,bc=0,winner='';while(!winner){const v=rc();if(side=='andar'){ac++;if(v==j)winner='andar'}else{bc++;if(v==j)winner='bahar'}side=side=='andar'?'bahar':'andar'}
-$('ap').textContent=ac+' cards';$('bp').textContent=bc+' cards';
-if($('pick').value==winner)settle(s,1.9,'Match landed on '+winner.toUpperCase()+' after '+(ac+bc)+' cards!','');else{bal-=s;say('Match landed on '+winner.toUpperCase()+' after '+(ac+bc)+' cards.','lose');render()}}
-</script></body></html>
+(function () {
+  "use strict";
+  var MULT = { andar: 1.9, bahar: 2.0 };
+  var NAMES = { andar: "Andar", bahar: "Bahar" };
+  var pick = "andar", busy = false, iv = null;
+
+  document.getElementById("jokerBox").innerHTML = BB.cardHTML("A", "s", true);
+  document.querySelectorAll("#pickRow .gk-chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      pick = b.getAttribute("data-pick");
+      document.querySelectorAll("#pickRow .gk-chip").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+  });
+  function setPicks(disabled) {
+    document.querySelectorAll("#pickRow .gk-chip").forEach(function (b) { b.disabled = disabled; });
+  }
+  function cardInto(boxId, c, match) {
+    var box = document.getElementById(boxId);
+    box.innerHTML = BB.cardHTML(c.r, c.s);
+    var el = box.firstChild;
+    el.classList.add("deal");
+    if (match) el.classList.add("match");
+  }
+
+  function deal() {
+    if (busy) return;
+    var stake = BB.placeBet();
+    if (!stake) return;
+    busy = true;
+    var btn = document.getElementById("gkAction");
+    btn.disabled = true;
+    setPicks(true);
+    ["A", "B"].forEach(function (s) {
+      document.getElementById("last" + s).innerHTML = '<div class="pile-empty">dealing&hellip;</div>';
+      document.getElementById("cnt" + s).textContent = "0 dealt";
+      document.getElementById("trail" + s).textContent = "";
+      document.getElementById("pileBox" + s).classList.remove("win");
+    });
+
+    var deck = BB.newDeck();
+    var joker = deck.pop();
+    cardInto("jokerBox", joker, false);
+    BB.msg("Joker is the " + joker.r + " \u2014 dealing, Andar first\u2026");
+
+    var counts = { andar: 0, bahar: 0 };
+    var trails = { andar: [], bahar: [] };
+    var turn = "andar";
+    var totalDealt = 0;
+
+    function finish(winnerSide) {
+      var totalCards = counts.andar + counts.bahar;
+      if (winnerSide === pick) {
+        var win = BB.settle(stake, MULT[pick]);
+        BB.msg(NAMES[winnerSide] + " matches the " + joker.r + " on card " + totalCards + " \u2014 you won GH\u20B5" + BB.fmt(win) + ".", "win");
+        BB.history(NAMES[pick] + " " + totalCards + " cards +" + BB.fmt(win), "w");
+        BB.burst(document.getElementById("stage"));
+      } else {
+        BB.msg(NAMES[winnerSide] + " matches the " + joker.r + " on card " + totalCards + " \u2014 your " + NAMES[pick] + " bet misses.", "lose");
+        BB.history(NAMES[winnerSide] + " " + totalCards + " cards -" + BB.fmt(stake), "l");
+      }
+      busy = false;
+      btn.disabled = false;
+      setPicks(false);
+      BB.render();
+    }
+
+    setTimeout(function () {
+      iv = setInterval(function () {
+        if (!deck.length) { // cannot happen with a live joker rank, but never hang
+          clearInterval(iv);
+          BB.credit(stake);
+          BB.msg("Deck ran out \u2014 stake returned.", "");
+          busy = false;
+          btn.disabled = false;
+          setPicks(false);
+          return;
+        }
+        var c = deck.pop();
+        counts[turn]++;
+        totalDealt++;
+        trails[turn].push(c.r);
+        var sfx = turn === "andar" ? "A" : "B";
+        var matched = c.r === joker.r;
+        cardInto("last" + sfx, c, matched);
+        document.getElementById("cnt" + sfx).textContent = counts[turn] + (counts[turn] === 1 ? " card" : " cards");
+        document.getElementById("trail" + sfx).textContent = trails[turn].slice(-8).join(" ");
+        if (matched) {
+          clearInterval(iv);
+          document.getElementById("pileBox" + sfx).classList.add("win");
+          setTimeout(function () { finish(turn); }, 450);
+          return;
+        }
+        turn = turn === "andar" ? "bahar" : "andar";
+      }, 400);
+    }, 650);
+  }
+
+  document.getElementById("gkAction").addEventListener("click", deal);
+})();
+</script>
+</body>
+</html>

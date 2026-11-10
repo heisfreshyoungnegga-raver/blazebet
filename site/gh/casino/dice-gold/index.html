@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golden Dice — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.dice-row{display:flex;gap:16px;justify-content:center;padding:22px 10px 8px}
+.die-face{width:84px;height:84px;border-radius:16px;background:#fff;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:12px;box-shadow:0 10px 24px #0006}
+.die-face i{border-radius:50%;margin:auto;width:15px;height:15px}
+.die-face i.on{background:#0a1f44}
+.zones{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:8px 12px 16px}
+.zone{border:2px solid #ffffff38;background:#ffffff14;color:#fff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;font-size:13.5px}
+.zone.on{border-color:#f5c542;background:#f5c542;color:#0a1f44}
+.total{font-size:15px;font-weight:800;text-align:center;color:#fff;min-height:22px}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Golden Dice</h1>
+  <p class="gk-sub">Gold-room dice, classic zones.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #b45309, #451a03)"><div class="dice-row"><div class="die-face" id="d1"></div><div class="die-face" id="d2"></div></div><div class="total" id="total">&nbsp;</div><div class="zones" id="zones"></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Pick a zone, then roll the pair.</div>
+    <button class="gk-bet" id="gkAction">ROLL DICE</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var ZONES = [{"id":"under","label":"Under 7 (2–6)","min":2,"max":6,"mult":2.33},{"id":"seven","label":"Exactly 7","min":7,"max":7,"mult":5.82},{"id":"over","label":"Over 7 (8–12)","min":8,"max":12,"mult":2.33}]; // {id,label,min,max,mult}
+  var PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+  var chosen = ZONES[0], busy = false;
+  var zonesEl = document.getElementById("zones"), btn = document.getElementById("gkAction");
+  ZONES.forEach(function (z, i) {
+    var b = document.createElement("button");
+    b.className = "zone" + (i === 0 ? " on" : ""); b.type = "button";
+    b.textContent = z.label + " \u00D7" + z.mult;
+    b.addEventListener("click", function () {
+      if (busy) return;
+      chosen = z;
+      zonesEl.querySelectorAll(".zone").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+    zonesEl.appendChild(b);
+  });
+  function face(el, v) {
+    el.innerHTML = "";
+    for (var i = 0; i < 9; i++) { var d = document.createElement("i"); if (PIPS[v].indexOf(i) >= 0) d.className = "on"; el.appendChild(d); }
+  }
+  face(document.getElementById("d1"), 5); face(document.getElementById("d2"), 3);
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    var f1 = 1 + BB.rand(6), f2 = 1 + BB.rand(6), total = f1 + f2, ticks = 0;
+    var iv = setInterval(function () {
+      face(document.getElementById("d1"), 1 + BB.rand(6));
+      face(document.getElementById("d2"), 1 + BB.rand(6));
+      if (++ticks >= 8) {
+        clearInterval(iv);
+        face(document.getElementById("d1"), f1); face(document.getElementById("d2"), f2);
+        document.getElementById("total").textContent = "Rolled " + total + " (" + f1 + " + " + f2 + ")";
+        var hit = total >= chosen.min && total <= chosen.max;
+        var win = BB.settle(stake, hit ? chosen.mult : 0);
+        if (hit) { BB.msg(chosen.label + " lands \u2014 you won GH\u20B5" + BB.fmt(win) + "!", "win"); BB.history(chosen.label + " \u00D7" + chosen.mult, "w"); }
+        else { BB.msg("Rolled " + total + " \u2014 " + chosen.label + " misses.", "lose"); BB.history("-" + BB.fmt(stake), "l"); }
+        busy = false; btn.disabled = false; BB.render();
+      }
+    }, 75);
+  });
+})();
+</script>
+</body>
+</html>

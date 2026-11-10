@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Scratch — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.scard{position:relative;width:300px;margin:16px auto 8px;border-radius:16px;overflow:hidden;background:#0a1f44}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px}
+.scell{aspect-ratio:1.4;border-radius:10px;background:#123a7a;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:17px}
+#foil{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.srow{display:flex;justify-content:center;padding:0 12px 14px}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Daily Scratch</h1>
+  <p class="gk-sub">Gentle card, frequent small wins.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #0ea5e9, #0c4a6e)"><div class="scard"><div class="sgrid" id="grid"></div><canvas id="foil" width="300" height="226"></canvas></div><div class="srow"><button class="gk-chip" id="reveal" type="button">REVEAL ALL</button></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Match 3 prizes under the foil to win.</div>
+    <button class="gk-bet" id="gkAction">BUY CARD</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var POOL = [[0,30],[0.5,25],[1,20],[2,12],[3,8],[5,4],[10,1]]; // [mult, weight]
+  var grid = document.getElementById("grid"), foil = document.getElementById("foil"), fctx = foil.getContext("2d");
+  var btn = document.getElementById("gkAction");
+  var live = false, settled = false, stake = 0, prizes = [];
+  var bag = [];
+  POOL.forEach(function (p) { for (var i = 0; i < p[1]; i++) bag.push(p[0]); });
+  function deal() {
+    prizes = [];
+    var forceWin = BB.rand(100) < 34;
+    var winMult = bag[BB.rand(bag.length)];
+    for (var i = 0; i < 9; i++) prizes.push(bag[BB.rand(bag.length)]);
+    if (forceWin && winMult > 0) { prizes[0] = prizes[1] = prizes[2] = winMult; }
+    grid.innerHTML = prizes.map(function (m) { return '<div class="scell">' + (m > 0 ? "\u00D7" + m : "\u2014") + "</div>"; }).join("");
+    fctx.globalCompositeOperation = "source-over";
+    var g = fctx.createLinearGradient(0, 0, 300, 226);
+    g.addColorStop(0, "#c0c7d1"); g.addColorStop(0.5, "#9aa5b5"); g.addColorStop(1, "#c0c7d1");
+    fctx.fillStyle = g; fctx.fillRect(0, 0, 300, 226);
+    fctx.fillStyle = "#5b6b82"; fctx.font = "800 19px 'Plus Jakarta Sans',sans-serif"; fctx.textAlign = "center";
+    fctx.fillText("SCRATCH HERE", 150, 118);
+    foil.style.display = "block";
+    settled = false;
+  }
+  function clearedPct() {
+    var d = fctx.getImageData(0, 0, 300, 226).data, clear = 0, tot = 0;
+    for (var i = 3; i < d.length; i += 40) { tot++; if (d[i] === 0) clear++; }
+    return clear / tot;
+  }
+  function settle() {
+    if (settled || !live) return;
+    settled = true; live = false;
+    foil.style.display = "none";
+    var counts = {};
+    prizes.forEach(function (m) { counts[m] = (counts[m] || 0) + 1; });
+    var best = 0;
+    Object.keys(counts).forEach(function (k) { if (counts[k] >= 3 && Number(k) > best) best = Number(k); });
+    var win = BB.settle(stake, best);
+    if (best > 0) { BB.msg("Three \u00D7" + best + " matched \u2014 you won GH\u20B5" + BB.fmt(win) + "!", "win"); BB.history("Scratch \u00D7" + best, "w"); if (best >= 10) BB.burst(document.getElementById("stage")); }
+    else { BB.msg("No matching triple on this card.", "lose"); BB.history("-" + BB.fmt(stake), "l"); }
+    btn.disabled = false; btn.textContent = "BUY CARD"; BB.render();
+  }
+  var scratching = false;
+  function scratchAt(e) {
+    var r = foil.getBoundingClientRect();
+    var x = (e.clientX - r.left) * (300 / r.width), y = (e.clientY - r.top) * (226 / r.height);
+    fctx.globalCompositeOperation = "destination-out";
+    fctx.beginPath(); fctx.arc(x, y, 22, 0, 7); fctx.fill();
+  }
+  foil.addEventListener("pointerdown", function (e) { if (!live) return; scratching = true; scratchAt(e); });
+  foil.addEventListener("pointermove", function (e) { if (scratching && live) { scratchAt(e); if (clearedPct() > 0.5) settle(); } });
+  window.addEventListener("pointerup", function () { scratching = false; });
+  document.getElementById("reveal").addEventListener("click", function () { if (live) settle(); });
+  btn.addEventListener("click", function () {
+    if (live) return;
+    var s = BB.placeBet(); if (!s) return;
+    stake = s; live = true; btn.disabled = true; btn.textContent = "CARD LIVE\u2026";
+    deal();
+    BB.msg("Scratch the foil \u2014 match 3 prizes to win.", "");
+  });
+  grid.innerHTML = '<div class="scell">?</div>'.repeat(9);
+})();
+</script>
+</body>
+</html>

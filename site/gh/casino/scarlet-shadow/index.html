@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scarlet Shadow — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.cs-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 12px 8px;gap:10px}
+.cs-orb{width:110px;height:110px;border-radius:50%;background:#334155;box-shadow:0 14px 30px #0007;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;text-align:center}
+.cs-orb.red{background:radial-gradient(circle at 35% 30%, #f87171, #dc2626 65%, #7f1d1d)}
+.cs-orb.black{background:radial-gradient(circle at 35% 30%, #64748b, #111827 65%, #000)}
+.cs-mult{font-size:15px;font-weight:800;color:#f5c542}
+.cs-btns{display:flex;gap:10px;justify-content:center;padding:6px 12px 18px}
+.cs-btn{border:0;border-radius:12px;padding:13px 22px;font-weight:800;cursor:pointer;font-size:15px;color:#fff}
+.cs-btn.red{background:#dc2626}.cs-btn.black{background:#111827;outline:1px solid #ffffff30}
+.cs-btn:disabled{opacity:.4;cursor:default}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Scarlet Shadow</h1>
+  <p class="gk-sub">Scarlet or shadow — call it right, climb the pot.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #e11d48, #1e1b4b)"><div class="cs-wrap"><div class="cs-orb" id="orb">?</div><div class="cs-mult" id="mult">&times;1.00 if you cash out</div></div><div class="cs-btns"><button class="cs-btn red" id="btnRed" type="button" disabled>SCARLET</button><button class="cs-btn black" id="btnBlack" type="button" disabled>SHADOW</button></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Call the next colour — streaks grow the pot.</div>
+    <button class="gk-bet" id="gkAction">START RUN</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var btn = document.getElementById("gkAction"), orb = document.getElementById("orb"), multEl = document.getElementById("mult");
+  var bR = document.getElementById("btnRed"), bB = document.getElementById("btnBlack");
+  var inRound = false, stake = 0, deck = [], mult = 1, steps = 0;
+  function remaining(color) {
+    var reds = deck.filter(function (c) { return c === "R"; }).length;
+    return color === "R" ? reds / deck.length : (deck.length - reds) / deck.length;
+  }
+  function refresh() { multEl.innerHTML = "&times;" + mult.toFixed(2) + " if you cash out now"; }
+  function endRound() { inRound = false; bR.disabled = true; bB.disabled = true; btn.textContent = "START RUN"; btn.className = "gk-bet"; }
+  function call(color) {
+    if (!inRound || !deck.length) return;
+    var p = remaining(color);
+    var drawn = deck.splice(BB.rand(deck.length), 1)[0];
+    orb.className = "cs-orb " + (drawn === "R" ? "red" : "black");
+    orb.textContent = drawn === "R" ? "SCARLET" : "SHADOW";
+    if (drawn !== color) {
+      BB.msg("Wrong colour \u2014 the run ends.", "lose");
+      BB.history("-" + BB.fmt(stake), "l");
+      endRound(); BB.render(); return;
+    }
+    mult = Math.floor(mult * (0.97 / Math.max(p, 0.02)) * 100) / 100;
+    steps++;
+    BB.msg("Right! Now \u00D7" + mult.toFixed(2) + ". Call again or cash out.", "");
+    refresh();
+  }
+  bR.addEventListener("click", function () { call("R"); });
+  bB.addEventListener("click", function () { call("B"); });
+  btn.addEventListener("click", function () {
+    if (inRound) {
+      if (steps === 0) { BB.msg("Make at least one call first.", ""); return; }
+      var win = BB.settle(stake, mult);
+      BB.msg("Cashed out at \u00D7" + mult.toFixed(2) + " \u2014 GH\u20B5" + BB.fmt(win) + " banked.", "win");
+      BB.history("\u00D7" + mult.toFixed(2) + " +" + BB.fmt(win - stake), "w");
+      BB.burst(document.getElementById("stage"));
+      endRound(); BB.render(); return;
+    }
+    var s = BB.placeBet(); if (!s) return;
+    stake = s; mult = 1; steps = 0; deck = [];
+    for (var i = 0; i < 26; i++) { deck.push("R"); deck.push("B"); }
+    orb.className = "cs-orb"; orb.textContent = "?";
+    inRound = true; bR.disabled = false; bB.disabled = false;
+    btn.textContent = "CASH OUT"; btn.className = "gk-bet cash";
+    refresh();
+    BB.msg("Fresh 52-card shoe, half red half black. Call the next colour.", "");
+  });
+})();
+</script>
+</body>
+</html>

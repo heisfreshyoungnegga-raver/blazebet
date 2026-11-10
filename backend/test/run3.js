@@ -1,9 +1,9 @@
 // Phase 3 tests: admin power pack (ported from production PrimeStake/Oddaroa patterns).
-process.env.BLIZBET_DB = require('node:path').join(__dirname, 'test3.db');
-for (const suf of ['', '-wal', '-shm']) require('node:fs').rmSync(process.env.BLIZBET_DB + suf, { force: true });
+process.env.BLAZEBET_DB = require('node:path').join(__dirname, 'test3.db');
+for (const suf of ['', '-wal', '-shm']) require('node:fs').rmSync(process.env.BLAZEBET_DB + suf, { force: true });
 const assert = require('node:assert');
 (async () => {
-  process.env.PORT = 4201; require('../src/server');
+  require('../src/server').start(4201);
   const base = 'http://127.0.0.1:4201';
   const call = async (m, p, body, tok) => { const r = await fetch(base + p, { method: m, headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) }, body: body ? JSON.stringify(body) : undefined }); let j = {}; try { j = await r.json(); } catch {} return { s: r.status, j }; };
   await new Promise(r => setTimeout(r, 300));

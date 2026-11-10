@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Egypt Plinko — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.pk-wrap{display:flex;flex-direction:column;align-items:center;padding:12px 6px 16px}
+canvas{max-width:100%}
+.bins-note{font-size:12.5px;color:#dbeafe;text-align:center}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Egypt Plinko</h1>
+  <p class="gk-sub">Drop the ball through 12 rows of pegs — edge bins pay up to ×10.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #a16207, #422006)"><div class="pk-wrap"><canvas id="board" width="340" height="380" style="width:340px;height:380px"></canvas><div class="bins-note">12 rows &middot; edge bins pay the most</div></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Drop a ball — where it lands is what you win.</div>
+    <button class="gk-bet" id="gkAction">DROP BALL</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var TABLE = [10,3,1.6,1.4,1.1,1,0.5,1,1.1,1.4,1.6,3,10];
+  var ROWS = 12;
+  var W = 340, H = 380, TOP = 30, BIN_H = 34, BOT = 10;
+  var canvas = document.getElementById("board"), ctx = canvas.getContext("2d");
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
+  function geom() { var u = (W - 20) / (ROWS + 1); return { u: u, rowGap: (H - TOP - BIN_H - BOT) / ROWS, pegR: ROWS >= 16 ? 2.4 : 3, ballR: 6 }; }
+  function pegXY(r, k, g) { return { x: W / 2 + (k - (r + 1) / 2) * g.u, y: TOP + g.rowGap * (r + 0.5) }; }
+  function binX(j, g) { return W / 2 + (j - ROWS / 2) * g.u; }
+  function binColor(m) { if (m >= 5) return "#d99a06"; if (m >= 2) return "#0ea5e9"; if (m > 1) return "#0b63e5"; if (m === 1) return "#33517a"; return "#8c2f39"; }
+  function mlabel(m) { return "\u00D7" + (m % 1 === 0 ? String(m) : m.toFixed(1)); }
+  var balls = [], flash = { bin: -1, until: 0 }, rafId = null;
+  var btn = document.getElementById("gkAction");
+  function draw(now) {
+    var g = geom();
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "#7db4ff";
+    ctx.beginPath(); ctx.moveTo(W / 2 - 7, 4); ctx.lineTo(W / 2 + 7, 4); ctx.lineTo(W / 2, 13); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#cfe2ff";
+    for (var r = 0; r < ROWS; r++) for (var k = 0; k < r + 2; k++) { var p = pegXY(r, k, g); ctx.beginPath(); ctx.arc(p.x, p.y, g.pegR, 0, Math.PI * 2); ctx.fill(); }
+    var binTop = H - BIN_H - BOT + 6;
+    for (var j = 0; j < TABLE.length; j++) {
+      var cx = binX(j, g), bw = g.u - 2.5, isFlash = flash.bin === j && now < flash.until;
+      ctx.fillStyle = binColor(TABLE[j]);
+      if (isFlash) { ctx.save(); ctx.shadowColor = "#fff"; ctx.shadowBlur = 16; }
+      var lift = isFlash ? -3 : 0;
+      ctx.beginPath(); ctx.roundRect(cx - bw / 2, binTop + lift, bw, BIN_H - 4, 5); ctx.fill();
+      if (isFlash) ctx.restore();
+      ctx.fillStyle = "#fff"; ctx.font = "800 " + (ROWS >= 16 ? 8.5 : ROWS >= 12 ? 9.5 : 11) + "px 'Plus Jakarta Sans',sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(mlabel(TABLE[j]), cx, binTop + lift + (BIN_H - 4) / 2);
+    }
+    balls.forEach(function (b) {
+      var grad = ctx.createRadialGradient(b.x - 2, b.y - 2, 1, b.x, b.y, g.ballR + 1);
+      grad.addColorStop(0, "#ffe98a"); grad.addColorStop(0.55, "#f5c542"); grad.addColorStop(1, "#c9930a");
+      ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(b.x, b.y, g.ballR, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = 1; ctx.stroke();
+    });
+  }
+  function step(now) {
+    var g = geom(), binTop = H - BIN_H - BOT + 6;
+    for (var i = balls.length - 1; i >= 0; i--) {
+      var b = balls[i], wp = b.path[b.wpi];
+      b.vy = Math.min(b.vy + 0.32, 7.5);
+      if (wp) {
+        b.vx += (wp.x - b.x) * 0.028; b.vx *= 0.90;
+        b.x += b.vx + (Math.random() - 0.5) * 0.5;
+        if (b.y >= wp.y - 2) { b.wpi++; b.vy = Math.max(2.2, b.vy * 0.55); }
+      }
+      b.y += b.vy;
+      if (b.y >= binTop + 12) { balls.splice(i, 1); land(b); }
+    }
+    draw(now || performance.now());
+    if (balls.length) rafId = requestAnimationFrame(step);
+    else { rafId = null; draw(performance.now()); btn.disabled = balls.length >= 3; }
+  }
+  function land(b) {
+    var mult = TABLE[b.bin], win = BB.settle(b.stake, mult);
+    flash = { bin: b.bin, until: performance.now() + 650 };
+    draw(performance.now());
+    var net = win - b.stake;
+    if (mult > 1) { BB.msg("Bin " + mlabel(mult) + " \u2014 returned GH\u20B5" + BB.fmt(win) + " (+" + BB.fmt(net) + ").", "win"); BB.history(mlabel(mult) + " +" + BB.fmt(net), "w"); if (mult >= 5) BB.burst(document.getElementById("stage")); }
+    else if (mult === 1) { BB.msg("Bin \u00D71 \u2014 stake back.", ""); BB.history("\u00D71 push", ""); }
+    else { BB.msg("Bin " + mlabel(mult) + " \u2014 returned GH\u20B5" + BB.fmt(win) + " of GH\u20B5" + BB.fmt(b.stake) + ".", "lose"); BB.history(mlabel(mult) + " -" + BB.fmt(-net), "l"); }
+    BB.render();
+  }
+  btn.addEventListener("click", function () {
+    if (balls.length >= 3) { BB.msg("Three balls already bouncing.", ""); return; }
+    var stake = BB.placeBet(); if (!stake) return;
+    var g = geom(), rights = 0, path = [], s = 0;
+    for (var r = 0; r < ROWS; r++) {
+      if (BB.rand(2) === 1) { rights++; s++; }
+      path.push({ x: W / 2 + (s - (r + 1) / 2) * g.u, y: TOP + g.rowGap * (r + 0.5) + g.rowGap * 0.52 });
+    }
+    path.push({ x: binX(rights, g), y: H - BIN_H - BOT + 14 });
+    balls.push({ x: W / 2 + (Math.random() * 4 - 2), y: 8, vx: 0, vy: 1.4, path: path, wpi: 0, bin: rights, stake: stake });
+    BB.msg("Ball away\u2026");
+    btn.disabled = balls.length >= 3;
+    if (!rafId) rafId = requestAnimationFrame(step);
+  });
+  draw(performance.now());
+})();
+</script>
+</body>
+</html>

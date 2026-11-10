@@ -1,24 +1,175 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Keno | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/keno.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/keno.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Keno</h1><p class="sub">Pick 5 numbers from 1-40. Ten are drawn - matches pay up to 50x.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="grid" id="board" style="grid-template-columns:repeat(8,1fr)"></div><p class="sub" id="picked" style="margin-top:8px">Picked: none (choose 5)</p><div class="msg" id="msg"></div></div>
-<button class="bet" onclick="play()">DRAW</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keno — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.tray{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:44px;align-items:center}
+.kball{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#a9ccff,#0b63e5 62%,#062a5e);color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(0,0,0,.45);animation:kpop .3s ease both}
+.kball.hitb{background:radial-gradient(circle at 32% 28%,#bbf7d0,#16a34a 62%,#14532d)}
+@keyframes kpop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.tray-note{color:#9db9dd;font-size:13px;font-weight:600}
+.hit-count{font-size:15px;color:#9db9dd;font-weight:700}
+.hit-count b{color:#fff;font-size:20px}
+.keno-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.knum{background:#082550;color:#dbeafe;border:1px solid #2e5ea8;border-radius:10px;padding:9px 0;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;min-height:40px;transition:background .12s ease,transform .08s ease}
+.knum:active{transform:scale(.93)}
+.knum.sel{background:#2e8cff;border-color:#7db4ff;color:#fff}
+.knum.drawn{border-color:#facc15;color:#fde68a}
+.knum.hit{background:#16a34a;border-color:#86efac;color:#fff}
+.pick-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.pick-row .gk-chip{flex:1}
+.pay-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pay-chip{font-size:11px;font-weight:800;padding:5px 9px;border-radius:999px;background:#082550;color:#9db9dd;border:1px solid rgba(255,255,255,.12)}
+.pay-chip b{color:#7db4ff}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Keno</h1>
+  <p class="gk-sub">Pick up to 10 numbers from 1&ndash;40. Ten balls are drawn &mdash; the more of your numbers that match, the bigger the payout.</p>
+
+  <section class="gk-stage" id="stage">
+    <div class="tray" id="tray"><span class="tray-note">Your drawn balls land here</span></div>
+    <div class="hit-count">Matches <b id="hits">&ndash;</b></div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Choose your numbers &mdash; <span id="pickCount">0</span>/10 picked</div>
+    <div class="keno-grid" id="grid"></div>
+    <div class="pick-row">
+      <button class="gk-chip" id="quickPick">Quick Pick 10</button>
+      <button class="gk-chip" id="clearPicks">Clear</button>
+    </div>
+    <div class="pay-row" id="payRow"></div>
+    <div class="gk-label" style="margin-top:14px">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Pick your numbers, then draw.</div>
+    <button class="gk-bet" id="gkAction">DRAW NUMBERS</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Draws are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-let picks=new Set();const board=$('board');
-for(let i=1;i<=40;i++){const b=document.createElement('button');b.className='cell';b.textContent=i;b.onclick=()=>{if(picks.has(i)){picks.delete(i);b.classList.remove('sel')}else if(picks.size<5){picks.add(i);b.classList.add('sel')}$('picked').textContent='Picked: '+(picks.size?[...picks].sort((a,b)=>a-b).join(', '):'none')+' ('+picks.size+'/5)'};board.appendChild(b)}
-function play(){const s=getStake();if(!s)return;if(picks.size!=5){say('Pick exactly 5 numbers first.','lose');return}
-const drawn=new Set();while(drawn.size<10)drawn.add(1+Math.floor(Math.random()*40));
-document.querySelectorAll('#board .cell').forEach(c=>{const n=+c.textContent;c.classList.toggle('hit',drawn.has(n)&&picks.has(n));c.classList.toggle('miss',drawn.has(n)&&!picks.has(n))});
-const hits=[...picks].filter(n=>drawn.has(n)).length;const pay={0:0,1:0,2:1,3:3,4:10,5:50};const mult=pay[hits];
-if(mult>0)settle(s,mult,hits+' of your numbers hit!','');else{bal-=s;say('Only '+hits+' hit - no payout (need 2+).','lose');render()}}
-</script></body></html>
+(function () {
+  var PAY = {
+    1: { 1: 3 },
+    2: { 2: 12 },
+    3: { 2: 1, 3: 20 },
+    4: { 2: 1, 3: 5, 4: 40 },
+    5: { 3: 2, 4: 15, 5: 150 },
+    6: { 3: 1, 4: 8, 5: 60, 6: 600 },
+    7: { 4: 3, 5: 25, 6: 150, 7: 1500 },
+    8: { 4: 2, 5: 12, 6: 80, 7: 600, 8: 3000 },
+    9: { 5: 5, 6: 40, 7: 250, 8: 1500, 9: 5000 },
+    10: { 5: 2, 6: 15, 7: 100, 8: 800, 9: 2500, 10: 10000 }
+  };
+  var picks = {}, pickCount = 0, drawing = false;
+  var grid = document.getElementById("grid");
+  var cells = {};
+  for (var n = 1; n <= 40; n++) {
+    var b = document.createElement("button");
+    b.className = "knum"; b.textContent = n; b.setAttribute("data-n", n);
+    grid.appendChild(b); cells[n] = b;
+    (function (num, el) {
+      el.addEventListener("click", function () {
+        if (drawing) return;
+        if (picks[num]) { delete picks[num]; pickCount--; el.classList.remove("sel"); }
+        else {
+          if (pickCount >= 10) { BB.msg("That is 10 picks already \u2014 tap one off to swap it.", "lose"); return; }
+          picks[num] = true; pickCount++; el.classList.add("sel");
+        }
+        document.getElementById("pickCount").textContent = pickCount;
+        showPay();
+      });
+    })(n, b);
+  }
+  function showPay() {
+    var row = document.getElementById("payRow");
+    if (!pickCount) { row.innerHTML = '<span class="pay-chip">Pick numbers to see what they pay</span>'; return; }
+    var t = PAY[pickCount], keys = Object.keys(t).sort(function (a, b) { return a - b; }), html = "";
+    keys.forEach(function (h) { html += '<span class="pay-chip">' + h + ' hit' + (h > 1 ? "s" : "") + ' <b>&times;' + t[h] + "</b></span>"; });
+    row.innerHTML = html;
+  }
+  showPay();
+  document.getElementById("quickPick").addEventListener("click", function () {
+    if (drawing) return;
+    picks = {}; pickCount = 0;
+    var pool = []; for (var i = 1; i <= 40; i++) pool.push(i);
+    for (var k = 0; k < 10; k++) {
+      var num = pool.splice(BB.rand(pool.length), 1)[0];
+      picks[num] = true; pickCount++;
+    }
+    for (var m = 1; m <= 40; m++) cells[m].classList.toggle("sel", !!picks[m]);
+    document.getElementById("pickCount").textContent = pickCount;
+    showPay();
+  });
+  document.getElementById("clearPicks").addEventListener("click", function () {
+    if (drawing) return;
+    picks = {}; pickCount = 0;
+    for (var m = 1; m <= 40; m++) cells[m].classList.remove("sel");
+    document.getElementById("pickCount").textContent = 0;
+    showPay();
+  });
+  function draw() {
+    if (drawing) return;
+    if (!pickCount) { BB.msg("Pick at least one number first.", "lose"); return; }
+    var stake = BB.placeBet();
+    if (!stake) return;
+    drawing = true;
+    var btn = document.getElementById("gkAction");
+    btn.disabled = true;
+    for (var m = 1; m <= 40; m++) cells[m].classList.remove("drawn", "hit");
+    var tray = document.getElementById("tray");
+    tray.innerHTML = "";
+    document.getElementById("hits").textContent = "0";
+    var pool = []; for (var i = 1; i <= 40; i++) pool.push(i);
+    var drawn = [];
+    for (var k = 0; k < 10; k++) drawn.push(pool.splice(BB.rand(pool.length), 1)[0]);
+    BB.msg("Drawing balls\u2026");
+    var idx = 0, hits = 0;
+    var iv = setInterval(function () {
+      var num = drawn[idx];
+      var ball = document.createElement("div");
+      ball.className = "kball" + (picks[num] ? " hitb" : "");
+      ball.textContent = num;
+      tray.appendChild(ball);
+      cells[num].classList.add("drawn");
+      if (picks[num]) { cells[num].classList.add("hit"); hits++; }
+      document.getElementById("hits").textContent = hits;
+      idx++;
+      if (idx >= drawn.length) {
+        clearInterval(iv);
+        var mult = (PAY[pickCount] && PAY[pickCount][hits]) || 0;
+        if (mult > 0) {
+          var win = BB.settle(stake, mult);
+          BB.msg(hits + " match" + (hits === 1 ? "" : "es") + " at \u00D7" + mult + " \u2014 you won GH\u20B5" + BB.fmt(win) + ".", "win");
+          BB.history(pickCount + " picks \u00B7 " + hits + " hits +" + BB.fmt(win), "w");
+          if (mult >= 5) BB.burst(document.getElementById("stage"));
+        } else {
+          BB.msg(hits + " match" + (hits === 1 ? "" : "es") + " \u2014 no payout on " + pickCount + " picks.", "lose");
+          BB.history(pickCount + " picks \u00B7 " + hits + " hits -" + BB.fmt(stake), "l");
+        }
+        drawing = false;
+        btn.disabled = false;
+        BB.render();
+      }
+    }, 280);
+  }
+  document.getElementById("gkAction").addEventListener("click", draw);
+})();
+</script>
+</body>
+</html>

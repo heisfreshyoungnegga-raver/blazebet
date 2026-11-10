@@ -1,58 +1,60 @@
-/* BlazeBet casino-plus: Royale-Gold-inspired upgrades for the casino homepage */
-.bb-ticker{overflow:hidden;background:#0a0a0a;border-block:1px solid #b8860b55;white-space:nowrap}
-.bb-ticker-track{display:inline-block;padding:8px 0;animation:bb-scroll 30s linear infinite;color:#f5d67b;font-weight:700;font-size:13px;letter-spacing:.04em}
+/* BlazeBet casino-plus — blue & white edition (Royale-Gold-inspired features) */
+.bb-ticker{overflow:hidden;background:#062a5e;white-space:nowrap}
+.bb-ticker-track{display:inline-block;padding:8px 0;animation:bb-scroll 30s linear infinite;color:#dbeafe;font-weight:700;font-size:13px;letter-spacing:.03em}
 .bb-ticker-track span{margin:0 18px}
-.bb-ticker-track i{color:#b8860b;font-style:normal}
+.bb-ticker-track i{color:#2e8cff;font-style:normal}
+.bb-ticker-track b{color:#7db4ff}
 @keyframes bb-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .bb-filters{display:flex;gap:8px;flex-wrap:wrap;padding:14px 4px 4px}
-.bb-pill{border:1px solid #b8860b88;background:#141414;color:#eee;border-radius:999px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer}
-.bb-pill[aria-pressed="true"]{background:linear-gradient(180deg,#ffd75e,#e0a81c);color:#1a1405;border-color:#e0a81c}
-.bb-badge{position:absolute;top:8px;left:8px;z-index:5;background:#e03131;color:#fff;font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px;box-shadow:0 2px 8px #0008}
-.bb-badge.new{background:#0ca678}
-.bb-rtp{position:absolute;bottom:8px;left:8px;z-index:5;background:#000a;color:#f5d67b;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid #b8860b66}
-.bb-section{max-width:1200px;margin:26px auto;padding:0 16px;color:#f3ead2}
-.bb-kicker{color:#e0a81c;font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
-.bb-h{font-size:26px;font-weight:900;letter-spacing:.01em;margin:4px 0 12px;color:#fff8e6}
-.bb-marquee{overflow:hidden;border:1px solid #b8860b44;border-radius:12px;background:#101010;white-space:nowrap}
-.bb-marquee-track{display:inline-block;padding:10px 0;animation:bb-scroll 38s linear infinite;font-size:13px;color:#e8e2cf}
+.bb-pill{border:1px solid #0b63e545;background:#fff;color:#0a1f44;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;min-height:40px}
+.bb-pill[aria-pressed="true"]{background:linear-gradient(135deg,#0b63e5,#2e8cff);color:#fff;border-color:#0b63e5;box-shadow:0 8px 18px -8px #0b63e580}
+.bb-badge{position:absolute;top:8px;left:8px;z-index:5;background:#e03131;color:#fff;font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px;box-shadow:0 2px 8px #04122e40}
+.bb-badge.new{background:#0b63e5}
+.bb-rtp{position:absolute;bottom:8px;left:8px;z-index:5;background:#04122ed9;color:#dbeafe;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid #ffffff2e}
+.bb-section{max-width:1200px;margin:26px auto;padding:0 16px;color:#0a1f44}
+.bb-kicker{color:#0b63e5;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.bb-h{font-size:26px;font-weight:800;letter-spacing:-.015em;margin:4px 0 12px;color:#0a1f44}
+.bb-marquee{overflow:hidden;border:1px solid #0b63e52e;border-radius:14px;background:#eef4ff;white-space:nowrap}
+.bb-marquee-track{display:inline-block;padding:10px 0;animation:bb-scroll 38s linear infinite;font-size:13px;color:#33517a}
 .bb-marquee-track span{margin:0 16px}
-.bb-marquee-track b{color:#ffd75e}
-.bb-tag{display:inline-block;background:#e0a81c;color:#1a1405;border-radius:6px;font-size:10px;font-weight:800;padding:1px 6px;margin-right:8px;vertical-align:1px}
+.bb-marquee-track b{color:#0a54c4}
+.bb-tag{display:inline-block;background:#0b63e5;color:#fff;border-radius:6px;font-size:10px;font-weight:800;padding:1px 6px;margin-right:8px;vertical-align:1px}
 .bb-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.bb-card{background:#121212;border:1px solid #b8860b44;border-radius:14px;padding:18px}
-.bb-card h3{margin:0 0 6px;color:#ffd75e;font-size:17px}
-.bb-card p{margin:0 0 10px;font-size:13px;line-height:1.5;color:#cfc7ab}
-.bb-card a{color:#ffd75e;font-weight:700;font-size:13px;text-decoration:none}
-.bb-soon{display:inline-block;border:1px solid #888;color:#bbb;border-radius:999px;font-size:10px;font-weight:700;padding:2px 8px;letter-spacing:.08em}
-.bb-code{display:inline-block;background:#000;border:1px dashed #e0a81c;color:#ffd75e;border-radius:8px;padding:2px 10px;font-weight:800;letter-spacing:.12em}
-.bb-board{background:#121212;border:1px solid #b8860b44;border-radius:14px;padding:8px 18px}
-.bb-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ffffff14;font-size:14px}
+.bb-card{background:#fff;border:1px solid #0b63e52e;border-radius:16px;padding:18px;box-shadow:0 10px 30px -18px #0a2a5e38}
+.bb-card h3{margin:0 0 6px;color:#0a1f44;font-size:17px}
+.bb-card p{margin:0 0 10px;font-size:13px;line-height:1.5;color:#33517a}
+.bb-card a{color:#0b63e5;font-weight:700;font-size:13px;text-decoration:none}
+.bb-soon{display:inline-block;border:1px solid #64809f;color:#64809f;border-radius:999px;font-size:10px;font-weight:700;padding:2px 8px;letter-spacing:.08em}
+.bb-code{display:inline-block;background:#eef4ff;border:1px dashed #0b63e5;color:#0a54c4;border-radius:8px;padding:2px 10px;font-weight:800;letter-spacing:.12em}
+.bb-board{background:#fff;border:1px solid #0b63e52e;border-radius:16px;padding:8px 18px;box-shadow:0 10px 30px -18px #0a2a5e38}
+.bb-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #0a2a5e12;font-size:14px}
 .bb-row:last-child{border-bottom:none}
-.bb-row .rk{display:inline-flex;width:26px;height:26px;border-radius:50%;background:#2a2a2a;color:#ffd75e;align-items:center;justify-content:center;font-weight:800;margin-right:10px;font-size:12px}
-.bb-row.first .rk{background:linear-gradient(180deg,#ffd75e,#e0a81c);color:#1a1405}
-.bb-row .amt{color:#ffd75e;font-weight:800}
+.bb-row .rk{display:inline-flex;width:26px;height:26px;border-radius:50%;background:#e3edff;color:#0a54c4;align-items:center;justify-content:center;font-weight:800;margin-right:10px;font-size:12px}
+.bb-row.first .rk{background:linear-gradient(135deg,#0b63e5,#2e8cff);color:#fff}
+.bb-row .amt{color:#0a54c4;font-weight:800}
 .bb-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.bb-step{background:#121212;border:1px solid #ffffff1c;border-radius:14px;padding:18px;position:relative;overflow:hidden}
-.bb-step .ghost{position:absolute;right:8px;top:2px;font-size:44px;font-weight:900;color:#ffffff10;letter-spacing:.02em}
-.bb-step h3{margin:0 0 6px;color:#fff8e6;font-size:16px}
-.bb-step p{margin:0;font-size:13px;line-height:1.5;color:#cfc7ab}
-.bb-step .n{color:#e0a81c;font-weight:800;font-size:12px;letter-spacing:.18em}
-.bb-rg{background:#171207;border:1px solid #b8860b55;border-radius:14px;padding:18px;font-size:13px;line-height:1.6;color:#d8cfb2}
-.bb-rg b{color:#ffd75e}
-/* Dice showcase */
-.bb-show{background:radial-gradient(120% 140% at 50% 0%,#1d2b16 0%,#0d130a 60%);border:1px solid #b8860b55;border-radius:16px;padding:20px;text-align:center}
-.bb-diceface{width:96px;height:96px;margin:10px auto;background:#fdfdf8;border-radius:18px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:14px;box-shadow:0 10px 30px #000a}
+.bb-step{background:#fff;border:1px solid #0b63e52e;border-radius:16px;padding:18px;position:relative;overflow:hidden;box-shadow:0 10px 30px -18px #0a2a5e38}
+.bb-step .ghost{position:absolute;right:8px;top:2px;font-size:44px;font-weight:900;color:#0b63e50f;letter-spacing:.02em}
+.bb-step h3{margin:0 0 6px;color:#0a1f44;font-size:16px}
+.bb-step p{margin:0;font-size:13px;line-height:1.5;color:#33517a}
+.bb-step .n{color:#0b63e5;font-weight:800;font-size:12px;letter-spacing:.18em}
+.bb-rg{background:#eef4ff;border:1px solid #0b63e52e;border-radius:16px;padding:18px;font-size:13px;line-height:1.6;color:#33517a}
+.bb-rg b{color:#0a54c4}
+/* Dice showcase — the one deep-blue panel */
+.bb-show{background:linear-gradient(150deg,#062a5e 0%,#0b63e5 75%,#2e8cff 130%);border-radius:18px;padding:20px;text-align:center;color:#eef4ff;box-shadow:0 24px 48px -24px #062a5e80}
+.bb-diceface{width:96px;height:96px;margin:10px auto;background:#fdfdf8;border-radius:18px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:14px;box-shadow:0 10px 30px #04122e66}
 .bb-diceface i{width:16px;height:16px;border-radius:50%;background:transparent;place-self:center}
-.bb-diceface i.on{background:#141414}
+.bb-diceface i.on{background:#0a1f44}
 .bb-diceface.rolling{animation:bb-shake .12s linear infinite}
 @keyframes bb-shake{0%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-3px)}100%{transform:rotate(-3deg)}}
-.bb-bal{color:#ffd75e;font-weight:800}
+.bb-bal{color:#7db4ff;font-weight:800}
 .bb-ctl{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
-.bb-chip{border:1px solid #b8860b88;background:#181818;color:#eee;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer}
-.bb-chip[aria-pressed="true"]{background:linear-gradient(180deg,#ffd75e,#e0a81c);color:#1a1405}
-.bb-roll{background:linear-gradient(180deg,#ffd75e,#e0a81c);color:#1a1405;border:none;border-radius:999px;padding:12px 38px;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.04em}
+.bb-chip{border:1px solid #ffffff45;background:#ffffff14;color:#fff;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;min-height:40px}
+.bb-chip[aria-pressed="true"]{background:#fff;color:#0a54c4;border-color:#fff}
+.bb-roll{background:#fff;color:#0a54c4;border:none;border-radius:999px;padding:13px 38px;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.03em;box-shadow:0 12px 26px -10px #04122e80}
 .bb-roll:disabled{opacity:.5;cursor:wait}
-.bb-slider{width:min(420px,90%);accent-color:#e0a81c}
-.bb-msg{min-height:22px;font-weight:700;color:#fff8e6}
-.bb-msg.win{color:#7ee787}
-.bb-sub{font-size:12px;color:#bdb294}
+.bb-slider{width:min(420px,90%);accent-color:#7db4ff}
+.bb-msg{min-height:22px;font-weight:700;color:#fff}
+.bb-msg.win{color:#86efac}
+.bb-sub{font-size:12px;color:#cfe2ff}
+.bb-show a{color:#fff !important}

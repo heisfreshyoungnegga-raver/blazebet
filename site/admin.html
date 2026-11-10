@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BlazeBet Admin Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#0b63e5;--navy:#062a5e;--ink:#04122e;--mid:#33517a;--low:#64809f;--line:#0a2a5e1f;--bg:#f4f8ff;--card:#fff;--win:#16a34a;--err:#dc2626;--chip:#e3edff}
+*{box-sizing:border-box}body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#0b63e5,#062a5e);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10}
+.hwrap{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em}.logo span{color:#9cc2ff}
+.hwrap nav{display:flex;gap:14px;margin-left:auto;align-items:center;flex-wrap:wrap}
+.hwrap nav a{color:#dbeafe;text-decoration:none;font-weight:600;font-size:14px}
+.hwrap nav a:hover{color:#fff}
+#userChip{font-size:13px;background:#ffffff22;padding:6px 10px;border-radius:99px}
+button{font-family:inherit;cursor:pointer}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:700;font-size:14px}
+.btn:hover{background:#2e8cff}.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+.btn.danger{background:var(--err)}.btn.small{padding:6px 10px;font-size:13px}.btn:disabled{opacity:.5;cursor:not-allowed}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:22px;margin:6px 0 2px}h2{font-size:17px;margin:0 0 10px}.sub{color:var(--mid);font-size:14px;margin:0 0 16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 15px;font-weight:700;font-size:14px;color:var(--mid)}
+.tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px #0a2a5e0a,0 10px 30px -18px #0a2a5e38}
+.panel{display:none}.panel.active{display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--low);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.tblwrap{overflow-x:auto}
+label{display:block;font-size:13px;font-weight:600;color:var(--mid);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #c9d9f5;border-radius:10px;font:inherit;font-size:14px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid #9cc2ff;border-color:var(--brand)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 14px}
+.msg{padding:10px 12px;border-radius:10px;font-size:14px;margin:10px 0;display:none}
+.msg.ok{display:block;background:#e7f8ee;color:#166534;border:1px solid #bfe8cd}
+.msg.err{display:block;background:#fdecec;color:#991b1b;border:1px solid #f5c6c6}
+.msg.info{display:block;background:#e3edff;color:#062a5e;border:1px solid #bcd4fb}
+.muted{color:var(--low);font-size:13px}.money{font-variant-numeric:tabular-nums;font-weight:700;color:#0a54c4}
+.badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700;background:var(--chip);color:var(--navy)}
+.badge.green{background:#e7f8ee;color:#166534}.badge.red{background:#fdecec;color:#991b1b}.badge.grey{background:#eef2f7;color:var(--mid)}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap}
+.thread{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;background:#fff}
+.thread:hover{border-color:var(--brand)}
+.thread.sel{border-color:var(--brand);background:#eef4ff}
+.chatmsg{padding:8px 12px;border-radius:10px;margin:6px 0;max-width:85%;font-size:14px}
+.chatmsg.user{background:#eef2f7}.chatmsg.admin{background:#e3edff;margin-left:auto}
+.loginbox{max-width:420px;margin:40px auto}
+.note{background:#fff8e1;border:1px solid #f0d48a;color:#7c5a00;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+@media(max-width:640px){th,td{padding:7px 5px;font-size:13px}.hwrap nav{margin-left:0}}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="logo">Blaze<span>Bet</span> &nbsp;<span style="font-size:13px;font-weight:600;opacity:.85">Admin Portal</span></div>
+  <nav>
+    <a href="/index.html">Player site</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/super-admin.html">Super Admin</a>
+    <span id="userChip" style="display:none"></span>
+    <button class="btn ghost small" id="logoutBtn" style="display:none">Log out</button>
+  </nav>
+</div></header>
+<main>
+  <!-- Login gate -->
+  <div id="loginView" class="loginbox card" style="display:none">
+    <h1>Admin sign in</h1>
+    <p class="sub">Sign in with your admin phone number and password.</p>
+    <div class="msg" id="loginMsg"></div>
+    <form id="loginForm">
+      <label for="phone">Phone number</label>
+      <input id="phone" type="tel" autocomplete="username" placeholder="+233..." required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <div style="margin-top:16px"><button class="btn" type="submit" style="width:100%">Sign in</button></div>
+    </form>
+    <p class="muted" id="apiOverrideBox" style="margin-top:14px">API base: <span id="apiBaseLabel"></span><br>
+    <label for="apiOverride">Override API base (optional)</label>
+    <input id="apiOverride" type="url" placeholder="http://localhost:4180">
+    <button class="btn ghost small" id="saveApiBtn" type="button" style="margin-top:8px">Save API base</button></p>
+  </div>
+
+  <!-- App -->
+  <div id="appView" style="display:none">
+    <h1>Operations</h1>
+    <p class="sub" id="roleLine"></p>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="worksheet">Worksheet</button>
+      <button class="tab" data-tab="queue">Queue</button>
+      <button class="tab" data-tab="matches">Matches</button>
+      <button class="tab" data-tab="results">Results</button>
+      <button class="tab" data-tab="bets">Bets</button>
+      <button class="tab" data-tab="support">Support</button>
+      <button class="tab" data-tab="promos">Promos</button>
+    </div>
+    <div class="msg" id="globalMsg"></div>
+
+    <section class="panel active" id="panel-worksheet">
+      <div class="card"><h2>Daily worksheet</h2>
+        <p class="sub">Per-admin, per-day deposits and withdrawals confirmed and rejected, referrals joined and commission earned. Super admins see every admin; regular admins see only their own sheet.</p>
+        <div class="grid"><div><label for="wsDay">Day</label><input id="wsDay" type="date"></div>
+        <div><label>&nbsp;</label><button class="btn" id="wsLoad">Load worksheet</button></div></div>
+        <div id="wsOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-queue">
+      <div class="card"><h2>Payment queue</h2>
+        <p class="sub">Pending deposit and withdrawal requests. Confirming a deposit credits the player (and commission on a first deposit). Withdrawals are super-admin only — a regular admin confirming one gets a 403 from the API.</p>
+        <div class="note">Withdrawal rows: only a super admin can confirm or reject them. If you are a regular admin, use the Confirm/Reject buttons and the API will refuse with <b>super_only_for_withdrawals</b>.</div>
+        <button class="btn" id="queueReload">Refresh queue</button>
+        <div id="queueOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-matches">
+      <div class="card"><h2>Create match</h2>
+        <form id="matchForm"><div class="grid">
+          <div><label for="mLeague">League</label><input id="mLeague" value="Custom" required></div>
+          <div><label for="mHome">Home team</label><input id="mHome" required></div>
+          <div><label for="mAway">Away team</label><input id="mAway" required></div>
+          <div><label for="mKickoff">Kickoff</label><input id="mKickoff" type="datetime-local" required></div>
+          <div><label for="p1">Home win probability (0–1)</label><input id="p1" type="number" step="0.01" min="0" max="1" value="0.40" required></div>
+          <div><label for="px">Draw probability (0–1)</label><input id="px" type="number" step="0.01" min="0" max="1" value="0.30" required></div>
+          <div><label for="p2">Away win probability (0–1)</label><input id="p2" type="number" step="0.01" min="0" max="1" value="0.30" required></div>
+        </div>
+        <p class="muted">Probabilities must sum to 1 (within 0.02).</p>
+        <button class="btn" type="submit">Create match</button></form>
+        <div class="msg" id="matchMsg"></div>
+      </div>
+      <div class="card"><h2>Matches</h2>
+        <button class="btn" id="matchesReload">Refresh matches</button>
+        <div id="matchesOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-results">
+      <div class="card"><h2>Settle a match</h2>
+        <p class="sub">Enter the match id and the final 1X2 result. Settling pays out winning open bets once (idempotent) and marks the match finished.</p>
+        <form id="resultForm"><div class="grid">
+          <div><label for="rMatchId">Match ID</label><input id="rMatchId" type="number" min="1" required></div>
+          <div><label for="rResult">Result</label><select id="rResult"><option value="1">1 — Home win</option><option value="X">X — Draw</option><option value="2">2 — Away win</option><option value="void">Void — refund legs</option></select></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn" type="submit">Settle match</button></div></form>
+        <div class="msg" id="resultMsg"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-bets">
+      <div class="card"><h2>Bets</h2>
+        <p class="sub">Latest bets across all players. Voiding is super-admin only — a regular admin gets a 403 (super_only) from the API.</p>
+        <div class="grid"><div><label for="betStatus">Status filter</label><select id="betStatus"><option value="">All</option><option value="open">Open</option><option value="won">Won</option><option value="lost">Lost</option><option value="cashed_out">Cashed out</option><option value="void">Void</option></select></div>
+        <div><label>&nbsp;</label><button class="btn" id="betsReload">Load bets</button></div></div>
+        <div id="betsOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-support">
+      <div class="card"><h2>Support threads</h2>
+        <button class="btn" id="supportReload">Refresh threads</button>
+        <div id="threadsOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+      <div class="card" id="threadCard" style="display:none"><h2 id="threadTitle">Conversation</h2>
+        <div id="chatOut"></div>
+        <form id="replyForm"><label for="replyBody">Reply as admin</label>
+        <textarea id="replyBody" rows="3" required></textarea>
+        <div style="margin-top:10px"><button class="btn" type="submit">Send reply</button></div></form>
+        <div class="msg" id="replyMsg"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-promos">
+      <div class="card"><h2>Promo codes</h2>
+        <p class="sub" id="promoNote">Creating and deactivating promos is super-admin only. Regular admins see the list read-only.</p>
+        <form id="promoForm"><div class="grid">
+          <div><label for="promoCode">Code</label><input id="promoCode" placeholder="WELCOME" required></div>
+          <div><label for="promoBonus">Bonus (GH₵, stake-only)</label><input id="promoBonus" type="number" step="0.01" min="0.01" required></div>
+          <div><label for="promoMaxUses">Max uses (0 = unlimited)</label><input id="promoMaxUses" type="number" min="0" value="0"></div>
+          <div><label for="promoExpires">Expires (optional)</label><input id="promoExpires" type="datetime-local"></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn" type="submit" id="promoSubmit">Create / update promo</button></div></form>
+        <div class="msg" id="promoMsg"></div>
+      </div>
+      <div class="card"><h2>Existing promos</h2>
+        <button class="btn" id="promosReload">Refresh promos</button>
+        <div id="promosOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+(function(){
+'use strict';
+var API_DEFAULT = 'https://blazebet-api.vercel.app';
+// F-M1: portal override is scoped to 'bb_api_admin' (never the player site's
+// 'bb_api' key) and validated — https only, or http only for localhost.
+// An invalid/stale value is ignored, never silently redirecting the portal.
+function validApiBase(v) {
+  if (!v || typeof v !== 'string') return false;
+  try {
+    var u = new URL(v.trim());
+    if (u.protocol === 'https:') return true;
+    if (u.protocol === 'http:') return u.hostname === 'localhost' || u.hostname === '127.0.0.1' || u.hostname === '[::1]';
+  } catch (e) { return false; }
+  return false;
+}
+function isDebug() { try { return /[?&]debug=1/.test(location.search); } catch (e) { return false; } }
+var API = (function () {
+  try { var o = localStorage.getItem('bb_api_admin'); if (o && validApiBase(o)) return o.replace(/\/$/, ''); } catch (e) {}
+  if (window.BB_API && validApiBase(String(window.BB_API))) return String(window.BB_API).replace(/\/$/, '');
+  return API_DEFAULT;
+})();
+var token = localStorage.getItem('bb_token') || '';
+var me = null;
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function money(n){ var v=Number(n); if(!isFinite(v)) return 'GH₵ —'; return 'GH₵ ' + v.toLocaleString('en-GH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function showMsg(el, kind, text){ el.className='msg '+kind; el.textContent=text; }
+function globalMsg(kind, text){ showMsg($('globalMsg'), kind, text); }
+var API_TIMEOUT_MS = 18000; // F-H5: ~18s fetch timeout
+// F-H1: never throws — network failure / timeout returns {ok:false,status:0}
+// like bb-app.js, so boot() and every loader can show an error instead of a
+// blank page. F-H5: AbortController timeout; callers re-enable buttons in
+// a finally / after await (api() itself never throws).
+async function api(method, path, body){
+  var ctrl=null, timer=null;
+  try {
+    if (typeof AbortController !== 'undefined') { ctrl=new AbortController(); timer=setTimeout(function(){ ctrl.abort(); }, API_TIMEOUT_MS); }
+    var opts={method:method,headers:{'Content-Type':'application/json'}};
+    if(token) opts.headers.Authorization='Bearer '+token;
+    if(body!==undefined) opts.body=JSON.stringify(body);
+    if(ctrl) opts.signal=ctrl.signal;
+    var res=await fetch(API+path,opts);
+    if(timer) clearTimeout(timer);
+    var data={}; try{ data=await res.json(); }catch(e){}
+    return {ok:res.ok,status:res.status,data:data};
+  } catch (e) {
+    if(timer) clearTimeout(timer);
+    var timedOut = e && (e.name==='AbortError' || e.name==='TimeoutError');
+    return {ok:false,status:0,data:{error: timedOut ? 'request_timeout' : 'network_error', message: timedOut ? 'The request timed out. Check your connection and try again.' : 'Could not reach the BlazeBet server.'}};
+  }
+}
+function needLogin(){
+  // F-L6: the API-override input is hidden by default; only ?debug=1 shows it.
+  var ob=$('apiOverrideBox'); if(ob) ob.style.display=isDebug()?'':'none';
+  $('loginView').style.display='block'; $('appView').style.display='none'; $('apiBaseLabel').textContent=API; $('apiOverride').value=localStorage.getItem('bb_api_admin')||''; }
+function showApp(){
+  $('loginView').style.display='none'; $('appView').style.display='block';
+  $('userChip').style.display='inline-block'; $('userChip').textContent=me.phone+' · '+me.role;
+  $('logoutBtn').style.display='inline-block';
+  $('roleLine').textContent='Signed in as '+me.phone+' ('+me.role+'). Admin portal: worksheet, queue, matches, results, bets, support, promos.';
+  if(me.role!=='super_admin'){ $('promoSubmit').disabled=true; $('promoNote').textContent='You are signed in as a regular admin: promos are read-only for you (writes are super-admin only).'; }
+  loadWorksheet(); loadQueue(); loadMatches(); loadBets(); loadSupport(); loadPromos();
+}
+async function boot(){
+  if(!token){ needLogin(); return; }
+  var r=await api('GET','/api/me');
+  // F-H1: unreachable API (status 0) shows the login view + an error instead
+  // of a blank page, and keeps the token (it may still be valid).
+  if(r.status===0){ needLogin(); showMsg($('loginMsg'),'err','Could not reach the BlazeBet server (API base: '+API+'). Check your connection and try again.'); return; }
+  if(!r.ok){ localStorage.removeItem('bb_token'); token=''; needLogin(); globalMsg('err','Session expired — please sign in again.'); return; }
+  me=r.data.user;
+  if(me.role!=='admin' && me.role!=='super_admin'){ needLogin(); showMsg($('loginMsg'),'err','This portal is for admins. Your account role is "'+me.role+'".'); return; }
+  showApp();
+}
+$('logoutBtn').addEventListener('click',function(){
+  // F-H6: server-side logout (Phase 2 endpoint). Fire-and-forget with
+  // keepalive; a 404/absence is tolerated — the token is cleared regardless.
+  try { fetch(API+'/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json','Authorization':token?'Bearer '+token:''},body:'{}',keepalive:true}).catch(function(){}); } catch (e) {}
+  localStorage.removeItem('bb_token'); location.reload();
+});
+$('saveApiBtn').addEventListener('click',function(){
+  var v=$('apiOverride').value.trim();
+  if(v && !validApiBase(v)){ showMsg($('loginMsg'),'err','That API base is not valid — use https, or http only for localhost.'); return; }
+  if(v){ localStorage.setItem('bb_api_admin',v); } else { localStorage.removeItem('bb_api_admin'); }
+  location.reload();
+});
+$('loginForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var btn=e.target.querySelector('button[type=submit]'); btn.disabled=true;
+  var r;
+  try { r=await api('POST','/api/auth/login',{phone:$('phone').value.trim(),password:$('password').value}); }
+  finally { btn.disabled=false; }
+  if(!r.ok){ showMsg($('loginMsg'),'err','Sign in failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  token=r.data.token; localStorage.setItem('bb_token',token); me=r.data.user; showApp();
+});
+// Tabs
+$('tabs').addEventListener('click',function(e){
+  var b=e.target.closest('.tab'); if(!b) return;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  b.classList.add('active');
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  $('panel-'+b.dataset.tab).classList.add('active');
+});
+// Worksheet
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+async function loadWorksheet(){
+  var day=$('wsDay').value||todayStr(); $('wsDay').value=day;
+  var r=await api('GET','/api/admin/worksheet?day='+encodeURIComponent(day));
+  if(!r.ok){ $('wsOut').innerHTML='<p class="muted">Could not load worksheet: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var rows=r.data.queueWork||[], acts=r.data.actions||[];
+  var html='<p class="muted">Day: <b>'+esc(r.data.day||day)+'</b> · scope: '+(me.role==='super_admin'?'all admins':'your work only')+'</p>';
+  if(!rows.length) html+='<p class="muted">No decided queue work on this day yet.</p>';
+  else { html+='<div class="tblwrap"><table><tr><th>Admin ID</th><th>Type</th><th>Status</th><th>Count</th><th>Total</th></tr>';
+    rows.forEach(function(x){ html+='<tr><td>'+esc(x.decided_by)+'</td><td>'+esc(x.type)+'</td><td><span class="badge '+(x.status==='confirmed'?'green':x.status==='rejected'?'red':'')+'">'+esc(x.status)+'</span></td><td>'+esc(x.n)+'</td><td class="money">'+money(x.total)+'</td></tr>'; });
+    html+='</table></div>'; }
+  if(acts.length){ html+='<h3 style="margin-top:16px">Admin actions</h3><div class="tblwrap"><table><tr><th>Action</th><th>Count</th></tr>';
+    acts.forEach(function(a){ html+='<tr><td>'+esc(a.action)+'</td><td>'+esc(a.n)+'</td></tr>'; }); html+='</table></div>'; }
+  $('wsOut').innerHTML=html;
+}
+$('wsLoad').addEventListener('click',loadWorksheet);
+// Queue
+async function loadQueue(){
+  var r=await api('GET','/api/admin/queue');
+  if(!r.ok){ $('queueOut').innerHTML='<p class="muted">Could not load queue: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var reqs=r.data.requests||[];
+  if(!reqs.length){ $('queueOut').innerHTML='<p class="muted">Queue is empty — no pending requests.</p>'; return; }
+  var html='<div class="tblwrap"><table><tr><th>ID</th><th>User</th><th>Type</th><th>Amount</th><th>Method</th><th>Requested</th><th>Action</th></tr>';
+  reqs.forEach(function(x){
+    html+='<tr><td>'+esc(x.id)+'</td><td>'+esc(x.user_id)+'</td><td><span class="badge '+(x.type==='deposit'?'green':'')+'">'+esc(x.type)+'</span>'+(x.type==='withdrawal'&&me.role!=='super_admin'?'<br><span class="muted">super admin only</span>':'')+'</td><td class="money">'+money(x.amount)+'</td><td>'+esc(x.method||'')+'</td><td>'+esc((x.created_at||'').slice(0,19).replace('T',' '))+'</td><td><div class="rowbtns"><button class="btn small" data-q="'+x.id+'" data-a="confirm">Confirm</button><button class="btn small danger" data-q="'+x.id+'" data-a="reject">Reject</button></div></td></tr>';
+  });
+  html+='</table></div>';
+  $('queueOut').innerHTML=html;
+}
+$('queueReload').addEventListener('click',loadQueue);
+$('queueOut').addEventListener('click',async function(e){
+  var b=e.target.closest('button[data-q]'); if(!b) return;
+  // F-M6: confirming/rejecting moves real money — ask first.
+  if(!confirm((b.dataset.a==='confirm'?'Confirm':'Reject')+' request #'+b.dataset.q+'?')) return;
+  b.disabled=true;
+  var r=await api('POST','/api/admin/queue/'+b.dataset.q,{action:b.dataset.a});
+  if(r.ok){ globalMsg('ok','Request #'+b.dataset.q+' '+b.dataset.a+'ed.'); loadQueue(); }
+  else { globalMsg('err','Could not '+b.dataset.a+' request #'+b.dataset.q+': '+(r.data.error||('HTTP '+r.status))); b.disabled=false; }
+});
+// Matches
+async function loadMatches(){
+  var r=await api('GET','/api/admin/matches');
+  if(!r.ok){
+    if(r.status===404){
+      $('matchesOut').innerHTML='<div class="msg info" style="display:block">GET /api/admin/matches is not available yet on this backend — showing the public upcoming list instead.</div>';
+      var pub=await api('GET','/api/matches');
+      if(pub.ok) renderMatches(pub.data.matches||[], true);
+      else $('matchesOut').innerHTML+='<p class="muted">Public list also failed: '+esc(pub.data.error||('HTTP '+pub.status))+'</p>';
+      return;
+    }
+    $('matchesOut').innerHTML='<p class="muted">Could not load matches: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return;
+  }
+  renderMatches(r.data.matches||[], false);
+}
+function renderMatches(list, isPublic){
+  if(!list.length){ $('matchesOut').innerHTML+='<p class="muted">No matches found.</p>'; return; }
+  var html='<div class="tblwrap"><table><tr><th>ID</th><th>League</th><th>Match</th><th>Kickoff</th><th>Status</th><th>1X2 odds</th><th>Flags</th><th>Actions</th></tr>';
+  list.forEach(function(m){
+    var odds=m.odds1x2?m.odds1x2.map(function(o){return Number(o).toFixed(2);}).join(' / '):'—';
+    html+='<tr><td>'+esc(m.id)+'</td><td>'+esc(m.league||'')+'</td><td><b>'+esc(m.home)+'</b> vs <b>'+esc(m.away)+'</b></td><td>'+esc((m.starts_at||'').slice(0,16).replace('T',' '))+'</td><td>'+esc(m.status||'upcoming')+(m.home_score!=null?' '+m.home_score+'–'+m.away_score:'')+'</td><td>'+esc(odds)+'</td><td>'+(m.betting_locked?'<span class="badge red">Locked</span> ':'')+(m.featured?'<span class="badge green">Featured</span>':'')+'</td><td><div class="rowbtns"><button class="btn small" data-lock="'+m.id+'" data-locked="'+(m.betting_locked?1:0)+'">'+(m.betting_locked?'Unlock':'Lock')+'</button><button class="btn small ghost" data-feat="'+m.id+'" data-featv="'+(m.featured?1:0)+'">'+(m.featured?'Unfeature':'Feature')+'</button></div></td></tr>';
+  });
+  html+='</table></div>';
+  $('matchesOut').innerHTML=html;
+}
+$('matchesReload').addEventListener('click',loadMatches);
+$('matchesOut').addEventListener('click',async function(e){
+  var lb=e.target.closest('button[data-lock]'), fb=e.target.closest('button[data-feat]');
+  if(lb){ lb.disabled=true; var r=await api('POST','/api/admin/matches/'+lb.dataset.lock+'/lock',{locked:lb.dataset.locked!=='1'});
+    if(r.ok){ globalMsg('ok','Match #'+lb.dataset.lock+' '+(lb.dataset.locked==='1'?'unlocked':'locked')+'.'); loadMatches(); } else { globalMsg('err','Lock toggle failed: '+(r.data.error||('HTTP '+r.status))); lb.disabled=false; } }
+  if(fb){ fb.disabled=true; var r2=await api('POST','/api/admin/matches/'+fb.dataset.feat+'/feature',{featured:fb.dataset.featv!=='1'});
+    if(r2.ok){ globalMsg('ok','Match #'+fb.dataset.feat+' feature '+(fb.dataset.featv==='1'?'removed':'set')+'.'); loadMatches(); } else { globalMsg('err','Feature toggle failed: '+(r2.data.error||('HTTP '+r2.status))); fb.disabled=false; } }
+});
+$('matchForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var probs=[parseFloat($('p1').value),parseFloat($('px').value),parseFloat($('p2').value)];
+  var sum=probs.reduce(function(a,b){return a+b;},0);
+  if(probs.some(function(p){return !isFinite(p)||p<0||p>1;})||Math.abs(sum-1)>0.02){ showMsg($('matchMsg'),'err','Probabilities must each be 0–1 and sum to 1 (currently '+sum.toFixed(2)+').'); return; }
+  var r=await api('POST','/api/admin/matches',{league:$('mLeague').value.trim(),home:$('mHome').value.trim(),away:$('mAway').value.trim(),startsAt:new Date($('mKickoff').value).toISOString(),probs:probs});
+  if(!r.ok){ showMsg($('matchMsg'),'err','Create failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('matchMsg'),'ok','Match created — ID '+r.data.matchId+', 1X2 odds '+(r.data.odds1x2||[]).map(function(o){return Number(o).toFixed(2);}).join(' / ')+'.');
+  $('mHome').value=''; $('mAway').value=''; loadMatches();
+});
+// Results
+$('resultForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var r=await api('POST','/api/admin/results',{results:[{matchId:parseInt($('rMatchId').value,10),result:$('rResult').value}]});
+  if(!r.ok){ showMsg($('resultMsg'),'err','Settle failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('resultMsg'),'ok','Settled. Bets settled: '+r.data.settled+'.');
+  loadBets();
+});
+// Bets
+async function loadBets(){
+  var st=$('betStatus').value;
+  var r=await api('GET','/api/admin/bets'+(st?'?status='+encodeURIComponent(st):''));
+  if(!r.ok){ $('betsOut').innerHTML='<p class="muted">Could not load bets: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var bets=r.data.bets||[];
+  if(!bets.length){ $('betsOut').innerHTML='<p class="muted">No bets found.</p>'; return; }
+  var html='<div class="tblwrap"><table><tr><th>ID</th><th>User</th><th>Code</th><th>Stake</th><th>Potential</th><th>Payout</th><th>Status</th><th>Placed</th><th>Action</th></tr>';
+  bets.forEach(function(b){
+    html+='<tr><td>'+esc(b.id)+'</td><td>'+esc(b.user_id)+'</td><td>'+esc(b.code||'')+'</td><td class="money">'+money(b.stake)+'</td><td class="money">'+money(b.potential)+'</td><td class="money">'+(b.payout==null?'—':money(b.payout))+'</td><td><span class="badge '+(b.status==='won'?'green':b.status==='lost'||b.status==='void'?'red':'')+'">'+esc(b.status)+'</span></td><td>'+esc((b.created_at||'').slice(0,19).replace('T',' '))+'</td><td>'+(b.status==='open'?'<button class="btn small danger" data-void="'+b.id+'">Void'+(me.role!=='super_admin'?' (super only)':'')+'</button>':'')+'</td></tr>';
+  });
+  html+='</table></div>';
+  $('betsOut').innerHTML=html;
+}
+$('betsReload').addEventListener('click',loadBets);
+$('betsOut').addEventListener('click',async function(e){
+  var b=e.target.closest('button[data-void]'); if(!b) return;
+  if(!confirm('Void bet #'+b.dataset.void+' and refund the stake?')) return;
+  b.disabled=true;
+  var r=await api('POST','/api/admin/bets/'+b.dataset.void+'/void',{});
+  if(r.ok){ globalMsg('ok','Bet #'+b.dataset.void+' voided. Refunded '+money(r.data.refunded)+'.'); loadBets(); }
+  else { globalMsg('err','Void failed: '+(r.data.error||('HTTP '+r.status))+(me.role!=='super_admin'?' — voiding is super-admin only.':'')); b.disabled=false; }
+});
+// Support
+var currentThreadUser=null;
+async function loadSupport(){
+  var r=await api('GET','/api/admin/support');
+  if(!r.ok){ $('threadsOut').innerHTML='<p class="muted">Could not load threads: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var th=r.data.threads||[];
+  if(!th.length){ $('threadsOut').innerHTML='<p class="muted">No support messages yet.</p>'; return; }
+  $('threadsOut').innerHTML=th.map(function(t){
+    return '<div class="thread" data-user="'+t.user_id+'"><b>'+esc(t.phone||('User '+t.user_id))+'</b> '+(t.name?'· '+esc(t.name):'')+' <span class="badge">'+esc(t.msgs)+' msgs</span><br><span class="muted">'+esc(t.last_body||'')+'</span><br><span class="muted">'+esc((t.last_at||'').slice(0,19).replace('T',' '))+'</span></div>';
+  }).join('');
+}
+$('supportReload').addEventListener('click',loadSupport);
+$('threadsOut').addEventListener('click',async function(e){
+  var t=e.target.closest('.thread'); if(!t) return;
+  document.querySelectorAll('.thread').forEach(function(x){x.classList.remove('sel');}); t.classList.add('sel');
+  currentThreadUser=t.dataset.user;
+  $('threadCard').style.display='block';
+  var r=await api('GET','/api/admin/support?user='+encodeURIComponent(currentThreadUser));
+  if(!r.ok){ $('chatOut').innerHTML='<p class="muted">Could not load conversation: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  $('threadTitle').textContent='Conversation — user #'+currentThreadUser;
+  $('chatOut').innerHTML=(r.data.messages||[]).map(function(m){
+    return '<div class="chatmsg '+esc(m.sender)+'"><b>'+esc(m.sender==='admin'?'Admin':'Player')+':</b> '+esc(m.body)+'<br><span class="muted">'+esc((m.created_at||'').slice(0,19).replace('T',' '))+'</span></div>';
+  }).join('')||'<p class="muted">No messages.</p>';
+});
+$('replyForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(!currentThreadUser){ showMsg($('replyMsg'),'err','Pick a thread first.'); return; }
+  var r=await api('POST','/api/admin/support/'+currentThreadUser+'/reply',{body:$('replyBody').value.trim()});
+  if(!r.ok){ showMsg($('replyMsg'),'err','Reply failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('replyMsg'),'ok','Reply sent.');
+  $('replyBody').value='';
+  document.querySelector('.thread.sel')&&document.querySelector('.thread.sel').click();
+  loadSupport();
+});
+// Promos
+async function loadPromos(){
+  var r=await api('GET','/api/admin/promos');
+  if(!r.ok){ $('promosOut').innerHTML='<p class="muted">Could not load promos: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var ps=r.data.promos||[];
+  if(!ps.length){ $('promosOut').innerHTML='<p class="muted">No promo codes yet.</p>'; return; }
+  var html='<div class="tblwrap"><table><tr><th>Code</th><th>Bonus</th><th>Uses</th><th>Active</th><th>Expires</th><th>Action</th></tr>';
+  ps.forEach(function(p){
+    html+='<tr><td><b>'+esc(p.code)+'</b></td><td class="money">'+money(p.bonus)+'</td><td>'+esc(p.uses)+' / '+(p.max_uses===0?'unlimited':esc(p.max_uses))+'</td><td><span class="badge '+(p.active?'green':'red')+'">'+(p.active?'Active':'Inactive')+'</span></td><td>'+esc((p.expires_at||'—').slice(0,16).replace('T',' '))+'</td><td>'+(p.active?'<button class="btn small danger" data-deact="'+esc(p.code)+'"'+(me.role!=='super_admin'?' disabled':'')+'>Deactivate</button>':'')+'</td></tr>';
+  });
+  html+='</table></div>';
+  $('promosOut').innerHTML=html;
+}
+$('promosReload').addEventListener('click',loadPromos);
+$('promosOut').addEventListener('click',async function(e){
+  var b=e.target.closest('button[data-deact]'); if(!b) return;
+  b.disabled=true;
+  var r=await api('POST','/api/admin/promos',{code:b.dataset.deact,active:false});
+  if(r.ok){ globalMsg('ok','Promo '+b.dataset.deact+' deactivated.'); loadPromos(); }
+  else { globalMsg('err','Deactivate failed: '+(r.data.error||('HTTP '+r.status))); b.disabled=false; }
+});
+$('promoForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(me.role!=='super_admin'){ showMsg($('promoMsg'),'err','Promo writes are super-admin only.'); return; }
+  var body={code:$('promoCode').value.trim().toUpperCase(),bonus:parseFloat($('promoBonus').value),maxUses:parseInt($('promoMaxUses').value,10)||0};
+  if($('promoExpires').value) body.expiresAt=new Date($('promoExpires').value).toISOString();
+  var r=await api('POST','/api/admin/promos',body);
+  if(!r.ok){ showMsg($('promoMsg'),'err','Save failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('promoMsg'),'ok','Promo '+r.data.code+' saved — bonus '+money(r.data.bonus)+'.');
+  loadPromos();
+});
+boot();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hi-Lo Numbers — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.hl-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 12px 8px;gap:8px}
+.hl-num{font-size:64px;font-weight:800;color:#fff;text-shadow:0 8px 30px #0007;line-height:1}
+.hl-mult{font-size:15px;font-weight:800;color:#f5c542}
+.hl-btns{display:flex;gap:10px;justify-content:center;padding:8px 12px 18px}
+.hl-btn{border:0;border-radius:12px;padding:13px 20px;font-weight:800;cursor:pointer;font-size:15px;color:#fff}
+.hl-btn.hi{background:#16a34a}.hl-btn.lo{background:#0b63e5}
+.hl-btn:disabled{opacity:.4;cursor:default}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Hi-Lo Numbers</h1>
+  <p class="gk-sub">Start at 50. Call the next number higher or lower — each right call multiplies your pot.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #7c3aed, #2e1065)"><div class="hl-wrap"><div class="hl-num" id="num">50</div><div class="hl-mult" id="mult">&times;1.00 banked if you cash out</div></div><div class="hl-btns"><button class="hl-btn hi" id="btnHi" type="button" disabled>HIGHER</button><button class="hl-btn lo" id="btnLo" type="button" disabled>LOWER</button></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Call higher or lower — every right call grows the pot.</div>
+    <button class="gk-bet" id="gkAction">START RUN</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var btn = document.getElementById("gkAction"), numEl = document.getElementById("num"), multEl = document.getElementById("mult");
+  var bHi = document.getElementById("btnHi"), bLo = document.getElementById("btnLo");
+  var inRound = false, stake = 0, current = 50, mult = 1, steps = 0;
+  function probs() {
+    return { hi: (100 - current) / 100, lo: (current - 1) / 100 };
+  }
+  function refresh() {
+    var p = probs();
+    bHi.textContent = "HIGHER (" + Math.round(p.hi * 100) + "%)";
+    bLo.textContent = "LOWER (" + Math.round(p.lo * 100) + "%)";
+    multEl.innerHTML = "&times;" + mult.toFixed(2) + " if you cash out now";
+  }
+  function endRound() {
+    inRound = false; bHi.disabled = true; bLo.disabled = true;
+    btn.textContent = "START RUN"; btn.className = "gk-bet";
+  }
+  function guess(dir) {
+    if (!inRound) return;
+    var p = probs(), chance = dir === "hi" ? p.hi : p.lo;
+    var next = 1 + BB.rand(100);
+    var ok = dir === "hi" ? next > current : next < current;
+    numEl.textContent = next;
+    if (!ok) {
+      BB.msg(next + " \u2014 not " + (dir === "hi" ? "higher" : "lower") + ". The run ends.", "lose");
+      BB.history("-" + BB.fmt(stake), "l");
+      endRound(); BB.render(); return;
+    }
+    mult = Math.floor(mult * (0.97 / Math.max(chance, 0.01)) * 100) / 100;
+    steps++; current = next;
+    BB.msg("Right \u2014 " + next + "! Now \u00D7" + mult.toFixed(2) + ". Push on or cash out.", "");
+    refresh();
+  }
+  bHi.addEventListener("click", function () { guess("hi"); });
+  bLo.addEventListener("click", function () { guess("lo"); });
+  btn.addEventListener("click", function () {
+    if (inRound) {
+      if (steps === 0) { BB.msg("Make at least one call first.", ""); return; }
+      var win = BB.settle(stake, mult);
+      BB.msg("Cashed out at \u00D7" + mult.toFixed(2) + " after " + steps + " calls \u2014 GH\u20B5" + BB.fmt(win) + " banked.", "win");
+      BB.history("\u00D7" + mult.toFixed(2) + " +" + BB.fmt(win - stake), "w");
+      BB.burst(document.getElementById("stage"));
+      endRound(); BB.render(); return;
+    }
+    var s = BB.placeBet(); if (!s) return;
+    stake = s; current = 50; mult = 1; steps = 0; inRound = true;
+    numEl.textContent = "50";
+    bHi.disabled = false; bLo.disabled = false;
+    btn.textContent = "CASH OUT"; btn.className = "gk-bet cash";
+    refresh();
+    BB.msg("Starting at 50. Call the next number higher or lower.", "");
+  });
+})();
+</script>
+</body>
+</html>

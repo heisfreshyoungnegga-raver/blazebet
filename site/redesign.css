@@ -1,0 +1,158 @@
+/* ============================================================
+   BlazeBet redesign — blue & white system (2026-11-09)
+   Direction: "Stadium Sky" — one bold blue brand band (header),
+   clean white content surfaces, deep-navy ink, sky accents.
+   Type: Plus Jakarta Sans. Mobile-first app shell.
+   ============================================================ */
+
+/* ---------- 1. Tokens: flip the whole --bb-* system to blue/white ---------- */
+:root, html, html.light, .force-light {
+  --bb-bg: #ffffff;
+  --bb-chrome: #ffffff;
+  --bb-surface-1: #ffffff;
+  --bb-surface-2: #eef4ff;
+  --bb-chip: #e3edff;
+  --bb-chip-hover: #cdddff;
+  --bb-brand: #0b63e5;
+  --bb-brand-hover: #2e8cff;
+  --bb-brand-soft: #0a54c4;
+  --bb-brand-deep: #062a5e;
+  --bb-ink: #04122e;
+  --bb-text-hi: #0a1f44;
+  --bb-text-mid: #33517a;
+  --bb-text-low: #64809f;
+  --bb-line: #0a2a5e14;
+  --bb-line-strong: #0a2a5e2e;
+  --bb-neutral: #e8f0fd;
+  --bb-sheet: #ffffff;
+  --bb-disabled: #d7e5fa;
+  --bb-skeleton: #dce8fa;
+  --bb-skeleton-sheen: #ffffffb8;
+  --bb-money: #0a54c4;
+  --bb-money-bright: #0b63e5;
+  --bb-money-text: #0a54c4;
+  --bb-win: #16a34a;
+  --bb-live: #dc2626;
+  --bb-live-text: #dc2626;
+  --bb-scrim: #04122e80;
+  --bb-shadow-card: 0 1px 2px #0a2a5e0a, 0 10px 30px -18px #0a2a5e38;
+  --bb-shadow-pop: 0 4px 10px #0a2a5e14, 0 18px 40px -12px #0a2a5e30;
+  --bb-shadow-chrome-down: 0 12px 28px -14px #062a5e59;
+  --bb-shadow-chrome-up: 0 -8px 24px -12px #062a5e30;
+  --bb-shadow-chrome-right: 8px 0 20px -14px #062a5e2e;
+  --radius-md: .625rem;
+  --radius-lg: .875rem;
+  --radius-xl: 1.125rem;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---------- 2. Base polish ---------- */
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; }
+::selection { background: #0b63e5; color: #fff; }
+* { scrollbar-width: thin; scrollbar-color: #b9d2f8 transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #b9d2f8; border-radius: 99px; }
+h1, h2, h3 { letter-spacing: -0.015em; }
+img { user-select: none; }
+
+/* ---------- 3. Header: the one bold brand moment ---------- */
+header.desktop-header {
+  background: linear-gradient(112deg, #062a5e 0%, #0b63e5 62%, #2e8cff 115%);
+  color: #fff;
+  border-bottom: 1px solid #ffffff2e;
+  box-shadow: 0 14px 30px -16px #062a5e80;
+}
+header.desktop-header a, header.desktop-header button { color: #fff; }
+header.desktop-header svg[aria-label="BlazeBet"] { color: #fff; }
+header.desktop-header .bg-brand {
+  background-color: #ffffff !important;
+  color: #0b63e5 !important;
+  font-weight: 800;
+  box-shadow: 0 6px 16px -6px #04122e66;
+}
+header.desktop-header .bg-chip { background-color: #ffffff26; color: #fff; }
+header.desktop-header .text-text-low, header.desktop-header .text-text-mid { color: #cfe2ff; }
+
+/* ---------- 4. Mobile bottom tab bar ---------- */
+.bb-tabbar {
+  background: #fffffffa !important;
+  backdrop-filter: blur(14px);
+  border-top: 1px solid #0a2a5e17;
+}
+.bb-tabbar a { transition: color .15s ease, transform .15s ease; }
+.bb-tabbar a.bb-active { color: #0b63e5 !important; font-weight: 800; }
+.bb-tabbar a.bb-active svg { color: #0b63e5; }
+.bb-tabbar a:active { transform: scale(.94); }
+
+header.desktop-header a[aria-label="Deposit"] > span {
+  background: #ffffff !important;
+  color: #0b63e5 !important;
+  font-weight: 800;
+  box-shadow: 0 6px 16px -6px #04122e66;
+}
+
+/* Inline purple hero art baked into the capture -> blue system */
+[style*="#4c1d95"] {
+  background: linear-gradient(110deg, #0b63e5 0%, #0a3d8f 48%, #062a5e 100%) !important;
+}
+[style*="31,13,56"] {
+  background: linear-gradient(90deg, rgba(4,26,66,.97) 0%, rgba(4,26,66,.82) 47%, rgba(4,26,66,.04) 78%) !important;
+}
+
+/* ---------- 5. Casino lobby ---------- */
+.casino-featured-primary {
+  background: linear-gradient(120deg, #062a5e 0%, #0b63e5 58%, #2e8cff 110%) !important;
+}
+@media (min-width: 1024px) {
+  .casino-lobby-content { max-width: 76rem; }
+}
+.casino-lobby a[href*="/gh/casino/"] { border-radius: 1rem; }
+
+/* ---------- 6. Buttons, odds, chips: tactile and clear ---------- */
+button, a { touch-action: manipulation; }
+.bg-brand { background-image: linear-gradient(135deg, #0b63e5, #2e8cff); }
+button.bg-brand, a.bg-brand { box-shadow: 0 8px 18px -8px #0b63e580; }
+button:active, a:active { transition: transform .08s ease; }
+
+/* ---------- 7. Game pages: deep-blue felt ---------- */
+.bb-game body {
+  background: linear-gradient(180deg, #07265a 0%, #04122e 340px, #04122e 100%);
+  color: #eef4ff;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+.bb-game header { background: #0a2c5c; box-shadow: 0 10px 24px -14px #00000090; }
+.bb-game header a { color: #cfe2ff; }
+.bb-game .logo b { color: #7db4ff; }
+.bb-game .sub { color: #9db9dd; }
+.bb-game .panel {
+  background: #0d3573;
+  border: 1px solid #ffffff1f;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px -22px #000000a6;
+}
+.bb-game .stage { background: #082550; border-radius: 18px; border: 1px solid #ffffff14; }
+.bb-game .bal { color: #9db9dd; }
+.bb-game .bal b { color: #7db4ff; }
+.bb-game .chip { background: #16407e; color: #fff; transition: transform .1s ease, background .15s ease; }
+.bb-game .chip:hover { background: #1d4f99; }
+.bb-game .chip.on { background: #2e8cff; color: #fff; }
+.bb-game .chip:active { transform: scale(.95); }
+.bb-game input[type="number"], .bb-game input[type="text"] {
+  background: #082550; border: 1px solid #2e5ea8; color: #fff; border-radius: 12px;
+}
+.bb-game button.bet {
+  background: linear-gradient(135deg, #0b63e5, #2e8cff);
+  color: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 26px -10px #0b63e5a6;
+}
+.bb-game button.ghost { background: #16407e; color: #fff; }
+.bb-game [style*="ffb02e"] { color: #7db4ff !important; }
+.bb-game [style*="background:#ffb02e"], .bb-game [style*="background: #ffb02e"] { background: #2e8cff !important; }
+
+/* ---------- 8. Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

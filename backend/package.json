@@ -5,7 +5,7 @@
   "description": "BlazeBet backend - auth, wallet ledger, odds & game algorithms, bets, casino, admin",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node test/run.js && node test/run2.js && node test/run3.js && node test/run4.js",
+    "test": "node test/run.js && node test/run2.js && node test/run3.js && node test/run4.js && node test/run5.js",
     "test:pg": "node test/pg-run.js"
   },
   "engines": {

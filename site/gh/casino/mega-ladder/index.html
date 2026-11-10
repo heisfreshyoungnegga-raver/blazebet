@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mega Ladder — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.ld-wrap{padding:14px;display:flex;flex-direction:column;gap:7px;max-width:340px;margin:0 auto}
+.ld-floor{display:flex;gap:7px;align-items:center}
+.ld-tag{width:64px;font-size:12px;font-weight:800;color:#dbeafe;text-align:right}
+.ld-tile{flex:1;height:40px;border:0;border-radius:10px;background:linear-gradient(160deg,#2e8cff,#0b63e5);cursor:pointer;color:#fff;font-weight:800}
+.ld-tile:disabled{cursor:default}
+.ld-tile.safe{background:#0f3d22;outline:2px solid #22c55e}
+.ld-tile.bomb{background:#4c0519;outline:2px solid #ef4444}
+.ld-tile.dim{opacity:.45}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Mega Ladder</h1>
+  <p class="gk-sub">12 floors, 3 tiles each, one bomb per floor. Clear them all for ×100.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #dc2626, #450a0a)"><div class="ld-wrap" id="floors"></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Climb floor by floor — cash out anytime.</div>
+    <button class="gk-bet" id="gkAction">START CLIMB</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var FLOORS = 12, TILES = 3, MULTS = [1.46,2.13,3.1,4.52,6.59,9.62,14.04,20.49,29.91,43.66,63.74,93.06];
+  var wrap = document.getElementById("floors"), btn = document.getElementById("gkAction");
+  var inRound = false, stake = 0, floor = 0, bombs = [];
+  function build() {
+    wrap.innerHTML = "";
+    for (var f = FLOORS - 1; f >= 0; f--) {
+      var row = document.createElement("div"); row.className = "ld-floor";
+      row.innerHTML = '<span class="ld-tag">\u00D7' + MULTS[f].toFixed(2) + "</span>";
+      for (var t = 0; t < TILES; t++) {
+        var b = document.createElement("button");
+        b.className = "ld-tile"; b.type = "button"; b.textContent = "?"; b.disabled = true;
+        b.dataset.f = f; b.dataset.t = t;
+        row.appendChild(b);
+      }
+      wrap.appendChild(row);
+    }
+    wrap.querySelectorAll(".ld-tile").forEach(function (el) {
+      el.addEventListener("click", function () { step(Number(el.dataset.f), Number(el.dataset.t), el); });
+    });
+  }
+  function enableFloor() {
+    wrap.querySelectorAll(".ld-tile").forEach(function (el) {
+      el.disabled = !(inRound && Number(el.dataset.f) === floor);
+    });
+  }
+  function step(f, t, el) {
+    if (!inRound || f !== floor) return;
+    if (bombs[f] === t) {
+      el.className = "ld-tile bomb"; el.textContent = "X";
+      wrap.querySelectorAll(".ld-tile").forEach(function (x) { x.disabled = true; });
+      BB.msg("Bomb on floor " + (f + 1) + "! The climb ends.", "lose");
+      BB.history("-" + BB.fmt(stake), "l");
+      inRound = false; btn.textContent = "START CLIMB"; btn.className = "gk-bet"; BB.render();
+      return;
+    }
+    el.className = "ld-tile safe"; el.textContent = "\u2713";
+    wrap.querySelectorAll('.ld-tile[data-f="' + f + '"]').forEach(function (x) { if (x !== el) { x.classList.add("dim"); x.disabled = true; } });
+    floor++;
+    if (floor >= FLOORS) { cashOut(); return; }
+    BB.msg("Floor " + floor + " cleared \u2014 \u00D7" + MULTS[floor - 1].toFixed(2) + ". Next floor or cash out.", "");
+    enableFloor();
+  }
+  function cashOut() {
+    var m = MULTS[floor - 1], win = BB.settle(stake, m);
+    BB.msg("Cashed out at \u00D7" + m.toFixed(2) + " \u2014 GH\u20B5" + BB.fmt(win) + " banked.", "win");
+    BB.history("\u00D7" + m.toFixed(2) + " +" + BB.fmt(win - stake), "w");
+    BB.burst(document.getElementById("stage"));
+    wrap.querySelectorAll(".ld-tile").forEach(function (x) { x.disabled = true; });
+    inRound = false; btn.textContent = "START CLIMB"; btn.className = "gk-bet"; BB.render();
+  }
+  btn.addEventListener("click", function () {
+    if (inRound) { if (floor > 0) cashOut(); else BB.msg("Clear a floor first.", ""); return; }
+    var s = BB.placeBet(); if (!s) return;
+    stake = s; floor = 0; bombs = [];
+    for (var f = 0; f < FLOORS; f++) bombs.push(BB.rand(TILES));
+    build(); inRound = true;
+    btn.textContent = "CASH OUT"; btn.className = "gk-bet cash";
+    enableFloor();
+    BB.msg("Climb! One bomb hides on every floor.", "");
+  });
+  build();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neon Keno — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.kgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;padding:14px;max-width:360px;margin:0 auto}
+.knum{aspect-ratio:1;border:1px solid #2e5ea8;border-radius:9px;background:#082550;color:#dbeafe;font-weight:700;font-size:13px;cursor:pointer}
+.knum.on{background:#f5c542;color:#0a1f44;border-color:#f5c542}
+.knum.drawn{outline:3px solid #22c55e}
+.krow{display:flex;gap:8px;justify-content:center;padding:2px 12px 12px;flex-wrap:wrap}
+.kdraw{display:flex;gap:6px;justify-content:center;min-height:36px;padding:0 12px 6px;flex-wrap:wrap}
+.kball{width:34px;height:34px;border-radius:50%;background:#16a34a;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Neon Keno</h1>
+  <p class="gk-sub">Pick up to 12 numbers from 1–60. 12 balls are drawn — hits pay by probability.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #a21caf, #2e1065)"><div class="kdraw" id="drawn"></div><div class="kgrid" id="grid"></div><div class="krow"><button class="gk-chip" id="quick" type="button">QUICK PICK</button><button class="gk-chip" id="clear" type="button">CLEAR</button></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Pick your numbers, then draw.</div>
+    <button class="gk-bet" id="gkAction">DRAW BALLS</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var MAXN = 60, PICKS = 12, DRAW = 12;
+  var grid = document.getElementById("grid"), drawnEl = document.getElementById("drawn"), btn = document.getElementById("gkAction");
+  var picked = new Set(), busy = false, cells = [];
+  function comb(n, k) { if (k < 0 || k > n) return 0; var r = 1; for (var i = 0; i < k; i++) r = r * (n - i) / (i + 1); return r; }
+  function payFor(p, h) {
+    if (h <= 0) return 0;
+    var prob = comb(DRAW, h) * comb(MAXN - DRAW, p - h) / comb(MAXN, p);
+    if (prob <= 0) return 0;
+    var m = Math.floor(0.96 / prob);
+    return Math.max(0, Math.min(m, 10000));
+  }
+  for (var i = 1; i <= MAXN; i++) {
+    var b = document.createElement("button");
+    b.className = "knum"; b.type = "button"; b.textContent = i;
+    (function (n, el) {
+      el.addEventListener("click", function () {
+        if (busy) return;
+        if (picked.has(n)) { picked.delete(n); el.classList.remove("on"); }
+        else if (picked.size < PICKS) { picked.add(n); el.classList.add("on"); }
+        BB.msg(picked.size + " of " + PICKS + " numbers picked.", "");
+      });
+    })(i, b);
+    grid.appendChild(b); cells.push(b);
+  }
+  document.getElementById("quick").addEventListener("click", function () {
+    if (busy) return;
+    picked = new Set();
+    while (picked.size < PICKS) picked.add(1 + BB.rand(MAXN));
+    cells.forEach(function (c, i) { c.classList.toggle("on", picked.has(i + 1)); });
+    BB.msg(PICKS + " numbers picked for you.", "");
+  });
+  document.getElementById("clear").addEventListener("click", function () {
+    if (busy) return;
+    picked.clear(); cells.forEach(function (c) { c.classList.remove("on", "drawn"); }); drawnEl.innerHTML = "";
+  });
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    if (picked.size === 0) { BB.msg("Pick at least 1 number first (or Quick Pick).", ""); return; }
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    cells.forEach(function (c) { c.classList.remove("drawn"); });
+    drawnEl.innerHTML = "";
+    var poolSet = new Set();
+    while (poolSet.size < DRAW) poolSet.add(1 + BB.rand(MAXN));
+    var drawn = Array.from(poolSet), shown = 0;
+    var iv = setInterval(function () {
+      var n = drawn[shown++];
+      var ball = document.createElement("span"); ball.className = "kball"; ball.textContent = n;
+      drawnEl.appendChild(ball);
+      if (picked.has(n)) cells[n - 1].classList.add("drawn");
+      if (shown >= drawn.length) {
+        clearInterval(iv);
+        var hits = drawn.filter(function (x) { return picked.has(x); }).length;
+        var mult = payFor(picked.size, hits);
+        var win = BB.settle(stake, mult);
+        if (mult > 0) { BB.msg(hits + " hits on " + picked.size + " picks \u2014 \u00D7" + mult + "! You won GH\u20B5" + BB.fmt(win) + ".", "win"); BB.history(hits + " hits \u00D7" + mult, "w"); if (mult >= 25) BB.burst(document.getElementById("stage")); }
+        else { BB.msg(hits + " hits \u2014 no payout on " + picked.size + " picks.", "lose"); BB.history(hits + " hits -" + BB.fmt(stake), "l"); }
+        busy = false; btn.disabled = false; BB.render();
+      }
+    }, 200);
+  });
+})();
+</script>
+</body>
+</html>

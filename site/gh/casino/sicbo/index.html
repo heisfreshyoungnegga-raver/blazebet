@@ -1,23 +1,141 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Sic Bo | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/sicbo.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/sicbo.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Sic Bo</h1><p class="sub">Three dice. Small (4-10) or Big (11-17) pays 2x - triples go to the house. Exact triple pays 30x.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="stage"><div class="row" id="dice" style="font-size:56px;gap:14px"><span>&#9856;</span><span>&#9856;</span><span>&#9856;</span></div><div class="big" id="total">-</div><div class="msg" id="msg">Pick your bet and roll.</div></div></div>
-<div class="panel row"><select id="pick"><option value="small">Small 4-10 (2.00x)</option><option value="big">Big 11-17 (2.00x)</option><option value="triple">Any Triple (30.00x)</option></select></div>
-<button class="bet" onclick="play()">ROLL THREE DICE</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sic Bo — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.dice-row{display:flex;gap:12px;justify-content:center}
+.gk-die{width:66px;height:66px;padding:11px}
+.gk-die i{width:13px;height:13px}
+.total-badge{font-size:14px;color:#9db9dd;font-weight:700;text-align:center}
+.total-badge b{color:#fff;font-size:30px}
+.bet-row{display:flex;gap:8px;flex-wrap:wrap}
+.bet-row .gk-chip{flex:1;min-width:96px}
+.face-row{display:flex;gap:6px}
+.face-row .gk-chip{flex:1;padding:9px 0;min-width:0}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Sic Bo</h1>
+  <p class="gk-sub">Three dice, one roll. Back Small or Big, call any triple, or pick a number and get paid for every die that shows it.</p>
+
+  <section class="gk-stage" id="stage">
+    <div class="dice-row"><div class="gk-die" id="die1"></div><div class="gk-die" id="die2"></div><div class="gk-die" id="die3"></div></div>
+    <div class="total-badge">TOTAL <b id="total">&ndash;</b></div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your bet</div>
+    <div class="bet-row" id="betRow">
+      <button class="gk-chip on" data-bet="small">Small 4&ndash;10 &middot; &times;2</button>
+      <button class="gk-chip" data-bet="big">Big 11&ndash;17 &middot; &times;2</button>
+      <button class="gk-chip" data-bet="triple">Any Triple &middot; &times;31</button>
+    </div>
+    <div class="gk-label" style="margin-top:14px">Or pick a number &mdash; pays per die showing it: once &times;2, twice &times;3, three times &times;12</div>
+    <div class="face-row" id="faceRow">
+      <button class="gk-chip" data-face="1">1</button><button class="gk-chip" data-face="2">2</button>
+      <button class="gk-chip" data-face="3">3</button><button class="gk-chip" data-face="4">4</button>
+      <button class="gk-chip" data-face="5">5</button><button class="gk-chip" data-face="6">6</button>
+    </div>
+    <div class="gk-label" style="margin-top:14px">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Small and Big both lose on any triple. Pick your bet and roll.</div>
+    <button class="gk-bet" id="gkAction">ROLL DICE</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-const faces=['','\u2680','\u2681','\u2682','\u2683','\u2684','\u2685'];
-function play(){const s=getStake();if(!s)return;const d=[1,2,3].map(()=>1+Math.floor(Math.random()*6));const t=d.reduce((a,b)=>a+b,0);
-$('dice').innerHTML=d.map(x=>'<span>'+faces[x]+'</span>').join('');$('total').textContent=t;const triple=d[0]==d[1]&&d[1]==d[2];const p=$('pick').value;
-let win=false,mult=2;if(p=='triple'){win=triple;mult=30}else if(p=='small'){win=t>=4&&t<=10&&!triple}else{win=t>=11&&t<=17&&!triple}
-if(win)settle(s,mult,(triple?'Triple! ':'')+'Total '+t+'.','');else{bal-=s;say('Total '+t+(triple?' - triple, house wins this bet.':'. No win.'),'lose');render()}}
-</script></body></html>
+(function () {
+  var PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+  var bet = { type: "small", face: 0 };
+  var rolling = false;
+  function face(el, v) {
+    var on = PIPS[v], html = "";
+    for (var i = 0; i < 9; i++) html += '<i class="' + (on.indexOf(i) >= 0 ? "on" : "") + '"></i>';
+    el.innerHTML = html;
+  }
+  var dice = [document.getElementById("die1"), document.getElementById("die2"), document.getElementById("die3")];
+  face(dice[0], 1); face(dice[1], 2); face(dice[2], 3);
+  function clearOn() {
+    document.querySelectorAll("#betRow .gk-chip, #faceRow .gk-chip").forEach(function (x) { x.classList.remove("on"); });
+  }
+  document.querySelectorAll("#betRow .gk-chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (rolling) return;
+      bet = { type: b.getAttribute("data-bet"), face: 0 };
+      clearOn(); b.classList.add("on");
+    });
+  });
+  document.querySelectorAll("#faceRow .gk-chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (rolling) return;
+      bet = { type: "num", face: parseInt(b.getAttribute("data-face"), 10) };
+      clearOn(); b.classList.add("on");
+    });
+  });
+  function roll() {
+    if (rolling) return;
+    var stake = BB.placeBet();
+    if (!stake) return;
+    rolling = true;
+    var btn = document.getElementById("gkAction");
+    btn.disabled = true;
+    BB.msg("Dice rolling\u2026");
+    var vals = [1 + BB.rand(6), 1 + BB.rand(6), 1 + BB.rand(6)];
+    dice.forEach(function (d) { d.classList.add("rolling"); });
+    var iv = setInterval(function () { dice.forEach(function (d) { face(d, 1 + BB.rand(6)); }); }, 80);
+    setTimeout(function () {
+      clearInterval(iv);
+      dice.forEach(function (d, i) { d.classList.remove("rolling"); face(d, vals[i]); });
+      var total = vals[0] + vals[1] + vals[2];
+      document.getElementById("total").textContent = total;
+      var triple = vals[0] === vals[1] && vals[1] === vals[2];
+      var mult = 0, what = "";
+      if (bet.type === "small") {
+        what = "Small";
+        if (!triple && total >= 4 && total <= 10) mult = 2;
+      } else if (bet.type === "big") {
+        what = "Big";
+        if (!triple && total >= 11 && total <= 17) mult = 2;
+      } else if (bet.type === "triple") {
+        what = "Any Triple";
+        if (triple) mult = 31;
+      } else {
+        var count = vals.filter(function (v) { return v === bet.face; }).length;
+        what = "Number " + bet.face + " shown " + count + (count === 1 ? " time" : " times");
+        mult = count === 1 ? 2 : count === 2 ? 3 : count === 3 ? 12 : 0;
+      }
+      var rolledTxt = vals.join("-") + " = " + total + (triple ? " (triple!)" : "");
+      if (mult > 0) {
+        var win = BB.settle(stake, mult);
+        BB.msg(rolledTxt + ". " + what + " pays \u00D7" + mult + " \u2014 you won GH\u20B5" + BB.fmt(win) + ".", "win");
+        BB.history(total + (triple ? " TRIPLE" : "") + " +" + BB.fmt(win), "w");
+        BB.burst(document.getElementById("stage"));
+      } else {
+        BB.msg(rolledTxt + ". " + what + " misses.", "lose");
+        BB.history(total + (triple ? " TRIPLE" : "") + " -" + BB.fmt(stake), "l");
+      }
+      rolling = false;
+      btn.disabled = false;
+      BB.render();
+    }, 800);
+  }
+  document.getElementById("gkAction").addEventListener("click", roll);
+})();
+</script>
+</body>
+</html>

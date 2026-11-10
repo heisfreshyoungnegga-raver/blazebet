@@ -1,22 +1,167 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Turbo Cars | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/turbocars.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/turbocars.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Turbo Cars</h1><p class="sub">Pick your car and watch the street race. Winner pays 3.80x.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div id="track"></div><div class="msg" id="msg" style="margin-top:10px">Pick a car, then race.</div></div>
-<div class="panel row"><select id="pick"><option value="0">Red Rocket</option><option value="1">Blue Bolt</option><option value="2">Green Ghost</option><option value="3">Gold Flash</option></select></div>
-<button class="bet" onclick="race()">RACE</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turbo Cars — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.car{position:relative;width:104px;height:42px;flex:none}
+.car .top{position:absolute;left:26px;bottom:24px;width:50px;height:15px;border-radius:10px 12px 2px 2px;background:inherit;filter:brightness(1.25)}
+.car .body{position:absolute;left:0;right:0;bottom:7px;height:19px;border-radius:11px 16px 7px 7px;background:inherit;box-shadow:inset 0 -6px 8px rgba(0,0,0,.28),inset 0 4px 5px rgba(255,255,255,.3)}
+.car .wheel{position:absolute;bottom:0;width:17px;height:17px;border-radius:50%;background:#0b1220;border:3px solid #475569}
+.car .wheel.w1{left:13px}.car .wheel.w2{right:13px}
+.car.crimson{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+.car.azure{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
+.car.golden{background:linear-gradient(135deg,#facc15,#ca8a04)}
+.pick-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pick-card{background:#082550;border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 6px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;color:#dbeafe;font-family:inherit;transition:border-color .15s ease,background .15s ease}
+.pick-card .nm{font-size:12px;font-weight:800;text-align:center;line-height:1.25}
+.pick-card .od{font-size:11px;color:#9db9dd;font-weight:700}
+.pick-card.on{border-color:#2e8cff;background:#0d3573}
+.pick-card:disabled{opacity:.6;cursor:default}
+.track{width:100%;background:rgba(4,18,46,.62);border-radius:14px;padding:10px 10px 6px}
+.lane{position:relative;height:52px;border-bottom:2px dashed rgba(255,255,255,.16)}
+.lane:last-child{border-bottom:none}
+.lane .car{position:absolute;top:5px;left:0;width:84px;height:36px;will-change:left}
+.lane .car .top{left:21px;bottom:21px;width:40px;height:13px}
+.lane .car .body{bottom:6px;height:16px}
+.lane .car .wheel{width:14px;height:14px;border-width:2px}
+.lane .car .wheel.w1{left:10px}.lane .car .wheel.w2{right:10px}
+.lane .flag{position:absolute;right:0;top:4px;bottom:4px;width:8px;background:repeating-conic-gradient(#fdfdf8 0 25%,#0a1f44 0 50%) 0 0/8px 8px;opacity:.85;border-radius:2px}
+.lane.win{background:linear-gradient(90deg,rgba(34,197,94,.0),rgba(34,197,94,.22))}
+.lane-tag{position:absolute;right:14px;top:2px;font-size:10px;font-weight:800;color:#9db9dd;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Turbo Cars</h1>
+  <p class="gk-sub">Street race, three cars, one winner. Back your car &mdash; if it takes the flag, you bank &times;2.90.</p>
+
+  <section class="gk-stage has-photo" id="stage">
+    <img class="bg" src="/casino-img/turbocars.jpg" alt="">
+    <div class="gk-stage-in">
+      <div class="track" id="track"></div>
+    </div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your car</div>
+    <div class="pick-row" id="pickRow"></div>
+    <div class="gk-label" style="margin-top:14px">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Pick a car and hit race.</div>
+    <button class="gk-bet" id="gkAction">RACE</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-const cars=['\u{1F534} Red Rocket','\u{1F535} Blue Bolt','\u{1F7E2} Green Ghost','\u{1F7E1} Gold Flash'];
-function race(){const s=getStake();if(!s)return;const pick=+$('pick').value;const pos=[0,0,0,0];const tr=$('track');tr.innerHTML=cars.map((c,i)=>'<div style="margin:6px 0"><span style="font-size:13px">'+c+'</span><div style="background:#1d1924;border-radius:8px;height:22px"><div id="car'+i+'" style="height:22px;width:2%;border-radius:8px;background:'+['#dc2626','#2563eb','#16a34a','#eab308'][i]+'"></div></div></div>').join('');say('Racing...','');
-const t=setInterval(()=>{for(let i=0;i<4;i++){pos[i]+=Math.random()*9;document.getElementById('car'+i).style.width=Math.min(100,pos[i])+'%'}if(Math.max(...pos)>=100){clearInterval(t);const w=pos.indexOf(Math.max(...pos));
-if(w==pick)settle(s,3.8,cars[w]+' wins the race - your pick!','');else{bal-=s;say(cars[w]+' wins. Your car came up short.','lose');render()}}},120)}
-</script></body></html>
+(function () {
+  var CARS = [
+    { id: "crimson", name: "Crimson Comet", cls: "crimson" },
+    { id: "azure", name: "Azure Arrow", cls: "azure" },
+    { id: "golden", name: "Golden Bolt", cls: "golden" }
+  ];
+  var PAYOUT = 2.9;
+  var track = document.getElementById("track");
+  var pickRow = document.getElementById("pickRow");
+  var btn = document.getElementById("gkAction");
+  var pick = 0, racing = false;
+  var laneEls = [], carEls = [], pickBtns = [];
+
+  function carHTML(cls) {
+    return '<div class="car ' + cls + '"><div class="top"></div><div class="body"></div><div class="wheel w1"></div><div class="wheel w2"></div></div>';
+  }
+  CARS.forEach(function (c, i) {
+    var lane = document.createElement("div");
+    lane.className = "lane";
+    lane.innerHTML = carHTML(c.cls) + '<div class="flag"></div><div class="lane-tag">' + c.name.toUpperCase() + "</div>";
+    track.appendChild(lane);
+    laneEls.push(lane);
+    carEls.push(lane.querySelector(".car"));
+    var b = document.createElement("button");
+    b.className = "pick-card" + (i === 0 ? " on" : "");
+    b.type = "button";
+    b.innerHTML = carHTML(c.cls) + '<span class="nm">' + c.name + '</span><span class="od">wins &times;' + PAYOUT.toFixed(2) + "</span>";
+    b.addEventListener("click", function () {
+      pick = i;
+      pickBtns.forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+    pickRow.appendChild(b);
+    pickBtns.push(b);
+  });
+
+  function profile() {
+    var T = 3.5 + Math.random() * 1.0;
+    var d1 = 0.24 + Math.random() * 0.24;
+    var d2 = d1 + 0.28 + Math.random() * 0.22;
+    return { T: T, pts: [[0, 0], [T * 0.4, d1], [T * 0.75, d2], [T, 1]] };
+  }
+  function posAt(p, t) {
+    if (t >= p.T) return 1;
+    var pts = p.pts;
+    for (var i = 1; i < pts.length; i++) {
+      if (t <= pts[i][0]) {
+        var t0 = pts[i - 1][0], d0 = pts[i - 1][1], t1 = pts[i][0], d1 = pts[i][1];
+        return d0 + (d1 - d0) * ((t - t0) / (t1 - t0));
+      }
+    }
+    return 1;
+  }
+  function race() {
+    if (racing) return;
+    var stake = BB.placeBet();
+    if (!stake) return;
+    racing = true;
+    btn.disabled = true;
+    pickBtns.forEach(function (b) { b.disabled = true; });
+    laneEls.forEach(function (l) { l.classList.remove("win"); });
+    var profiles = CARS.map(profile);
+    var winner = 0;
+    profiles.forEach(function (p, i) { if (p.T < profiles[winner].T) winner = i; });
+    var maxT = Math.max(profiles[0].T, profiles[1].T, profiles[2].T);
+    BB.msg("Lights out \u2014 the race is on!");
+    var start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var t = (ts - start) / 1000;
+      var laneW = track.clientWidth - 20;
+      profiles.forEach(function (p, i) {
+        var pos = posAt(p, t);
+        carEls[i].style.left = Math.round(pos * Math.max(0, laneW - 92)) + "px";
+      });
+      if (t < maxT + 0.15) { requestAnimationFrame(frame); return; }
+      laneEls[winner].classList.add("win");
+      if (winner === pick) {
+        var win = BB.settle(stake, PAYOUT);
+        BB.msg(CARS[winner].name + " takes the flag \u2014 your car wins! GH\u20B5" + BB.fmt(win) + " banked.", "win");
+        BB.history(CARS[winner].name + " 1st +" + BB.fmt(win), "w");
+        BB.burst(document.getElementById("stage"));
+      } else {
+        BB.msg(CARS[winner].name + " wins it. " + CARS[pick].name + " comes home short this time.", "lose");
+        BB.history(CARS[winner].name + " 1st -" + BB.fmt(stake), "l");
+      }
+      racing = false;
+      btn.disabled = false;
+      pickBtns.forEach(function (b) { b.disabled = false; });
+      BB.render();
+    }
+    requestAnimationFrame(frame);
+  }
+  btn.addEventListener("click", race);
+})();
+</script>
+</body>
+</html>

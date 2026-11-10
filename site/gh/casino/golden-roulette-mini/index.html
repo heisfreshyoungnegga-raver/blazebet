@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golden Roulette Mini — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.mr-strip{display:flex;gap:5px;justify-content:center;padding:20px 10px 6px;flex-wrap:wrap;max-width:360px;margin:0 auto}
+.mr-cell{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;background:#334155}
+.mr-cell.red{background:#dc2626}.mr-cell.black{background:#111827}.mr-cell.green{background:#16a34a}
+.mr-cell.lit{outline:3px solid #f5c542;transform:scale(1.12)}
+.mr-bets{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px}
+.zone{border:2px solid #ffffff38;background:#ffffff14;color:#fff;border-radius:12px;padding:9px 12px;font-weight:800;cursor:pointer;font-size:13px}
+.zone.on{border-color:#f5c542;background:#f5c542;color:#0a1f44}
+.mr-pick{display:flex;gap:6px;justify-content:center;align-items:center;padding:0 12px 14px;color:#dbeafe;font-weight:700;font-size:13px}
+.mr-pick select{background:#082550;color:#fff;border:1px solid #2e5ea8;border-radius:10px;padding:8px;font-weight:700}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Golden Roulette Mini</h1>
+  <p class="gk-sub">A pocket wheel of 0–18. Red/black and even/odd pay ×2, a straight number pays ×18.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #b45309, #451a03)"><div class="mr-strip" id="strip"><div class="mr-cell green" data-n="0">0</div><div class="mr-cell red" data-n="1">1</div><div class="mr-cell black" data-n="2">2</div><div class="mr-cell red" data-n="3">3</div><div class="mr-cell black" data-n="4">4</div><div class="mr-cell red" data-n="5">5</div><div class="mr-cell black" data-n="6">6</div><div class="mr-cell red" data-n="7">7</div><div class="mr-cell black" data-n="8">8</div><div class="mr-cell red" data-n="9">9</div><div class="mr-cell black" data-n="10">10</div><div class="mr-cell red" data-n="11">11</div><div class="mr-cell black" data-n="12">12</div><div class="mr-cell red" data-n="13">13</div><div class="mr-cell black" data-n="14">14</div><div class="mr-cell red" data-n="15">15</div><div class="mr-cell black" data-n="16">16</div><div class="mr-cell red" data-n="17">17</div><div class="mr-cell black" data-n="18">18</div></div><div class="mr-bets" id="bets"></div><div class="mr-pick">Straight number: <select id="straight"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option></select></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Pick a bet, then spin.</div>
+    <button class="gk-bet" id="gkAction">SPIN</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var MAXN = 18, REDS = [1,3,5,7,9,11,13,15,17];
+  var BETS = [
+    { id: "red", label: "Red \u00D72", mult: 2, test: function (n) { return REDS.indexOf(n) >= 0; } },
+    { id: "black", label: "Black \u00D72", mult: 2, test: function (n) { return n !== 0 && REDS.indexOf(n) < 0; } },
+    { id: "even", label: "Even \u00D72", mult: 2, test: function (n) { return n !== 0 && n % 2 === 0; } },
+    { id: "odd", label: "Odd \u00D72", mult: 2, test: function (n) { return n % 2 === 1; } },
+    { id: "straight", label: "Straight \u00D7" + MAXN, mult: MAXN, test: function (n) { return n === Number(document.getElementById("straight").value); } }
+  ];
+  var chosen = BETS[0], busy = false;
+  var betsEl = document.getElementById("bets"), btn = document.getElementById("gkAction");
+  BETS.forEach(function (b, i) {
+    var el = document.createElement("button");
+    el.className = "zone" + (i === 0 ? " on" : ""); el.type = "button"; el.textContent = b.label;
+    el.addEventListener("click", function () {
+      if (busy) return;
+      chosen = b;
+      betsEl.querySelectorAll(".zone").forEach(function (x) { x.classList.remove("on"); });
+      el.classList.add("on");
+    });
+    betsEl.appendChild(el);
+  });
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    var result = BB.rand(MAXN + 1), ticks = 0;
+    var cellsEls = document.querySelectorAll(".mr-cell");
+    var iv = setInterval(function () {
+      cellsEls.forEach(function (c) { c.classList.remove("lit"); });
+      cellsEls[BB.rand(cellsEls.length)].classList.add("lit");
+      if (++ticks >= 12) {
+        clearInterval(iv);
+        cellsEls.forEach(function (c) { c.classList.toggle("lit", Number(c.dataset.n) === result); });
+        var hit = chosen.test(result);
+        var win = BB.settle(stake, hit ? chosen.mult : 0);
+        if (hit) { BB.msg(result + " lands \u2014 " + chosen.label + "! You won GH\u20B5" + BB.fmt(win) + ".", "win"); BB.history(chosen.id + " \u00D7" + chosen.mult, "w"); }
+        else { BB.msg(result + " lands \u2014 your bet misses.", "lose"); BB.history("-" + BB.fmt(stake), "l"); }
+        busy = false; btn.disabled = false; BB.render();
+      }
+    }, 80);
+  });
+})();
+</script>
+</body>
+</html>

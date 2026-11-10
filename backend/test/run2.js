@@ -11,7 +11,7 @@ assert.strictEqual(evaluatePoker([C(11,0),C(11,1),C(3,2),C(5,0),C(8,1)])[1], 1, 
 assert(Math.abs(minesMult(1, 1) - 1.01) < 0.011);
 console.log('poker/mines unit OK');
 (async () => {
-  process.env.PORT = 4200; require('../src/server');
+  require('../src/server').start(4200);
   const base = 'http://127.0.0.1:4200';
   const call = async (m, p, body, tok) => { const r = await fetch(base + p, { method: m, headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) }, body: body ? JSON.stringify(body) : undefined }); let j; try { j = await r.json(); } catch { j = {}; } return { s: r.status, j, raw: r }; };
   await new Promise(r => setTimeout(r, 300));

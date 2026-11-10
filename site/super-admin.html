@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BlazeBet Super Admin Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#0b63e5;--navy:#062a5e;--ink:#04122e;--mid:#33517a;--low:#64809f;--line:#0a2a5e1f;--bg:#f4f8ff;--card:#fff;--win:#16a34a;--err:#dc2626;--chip:#e3edff}
+*{box-sizing:border-box}body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#0b63e5,#062a5e);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10}
+.hwrap{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em}.logo span{color:#9cc2ff}
+.hwrap nav{display:flex;gap:14px;margin-left:auto;align-items:center;flex-wrap:wrap}
+.hwrap nav a{color:#dbeafe;text-decoration:none;font-weight:600;font-size:14px}
+.hwrap nav a:hover{color:#fff}
+#userChip{font-size:13px;background:#ffffff22;padding:6px 10px;border-radius:99px}
+button{font-family:inherit;cursor:pointer}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:700;font-size:14px}
+.btn:hover{background:#2e8cff}.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+.btn.danger{background:var(--err)}.btn.small{padding:6px 10px;font-size:13px}.btn:disabled{opacity:.5;cursor:not-allowed}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:22px;margin:6px 0 2px}h2{font-size:17px;margin:0 0 10px}.sub{color:var(--mid);font-size:14px;margin:0 0 16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 15px;font-weight:700;font-size:14px;color:var(--mid)}
+.tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px #0a2a5e0a,0 10px 30px -18px #0a2a5e38}
+.panel{display:none}.panel.active{display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--low);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.tblwrap{overflow-x:auto}
+label{display:block;font-size:13px;font-weight:600;color:var(--mid);margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #c9d9f5;border-radius:10px;font:inherit;font-size:14px;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid #9cc2ff;border-color:var(--brand)}
+input[type=checkbox]{width:auto;padding:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 14px}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+.stat .v{font-size:24px;font-weight:800;color:#0a54c4;font-variant-numeric:tabular-nums}
+.stat .k{font-size:13px;color:var(--mid);font-weight:600;margin-top:2px}
+.msg{padding:10px 12px;border-radius:10px;font-size:14px;margin:10px 0;display:none}
+.msg.ok{display:block;background:#e7f8ee;color:#166534;border:1px solid #bfe8cd}
+.msg.err{display:block;background:#fdecec;color:#991b1b;border:1px solid #f5c6c6}
+.msg.info{display:block;background:#e3edff;color:#062a5e;border:1px solid #bcd4fb}
+.muted{color:var(--low);font-size:13px}.money{font-variant-numeric:tabular-nums;font-weight:700;color:#0a54c4}
+.badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700;background:var(--chip);color:var(--navy)}
+.badge.green{background:#e7f8ee;color:#166534}.badge.red{background:#fdecec;color:#991b1b}.badge.grey{background:#eef2f7;color:var(--mid)}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap}
+.userrow{cursor:pointer}.userrow:hover td{background:#eef4ff}
+.note{background:#fff8e1;border:1px solid #f0d48a;color:#7c5a00;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+.linkbox{word-break:break-all;background:#eef4ff;border:1px solid #bcd4fb;border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}
+.loginbox{max-width:420px;margin:40px auto}
+@media(max-width:640px){th,td{padding:7px 5px;font-size:13px}.hwrap nav{margin-left:0}}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="logo">Blaze<span>Bet</span> &nbsp;<span style="font-size:13px;font-weight:600;opacity:.85">Super Admin</span></div>
+  <nav>
+    <a href="/index.html">Player site</a>
+    <a href="/admin.html">Admin</a>
+    <a href="/super-admin.html">Super Admin</a>
+    <span id="userChip" style="display:none"></span>
+    <button class="btn ghost small" id="logoutBtn" style="display:none">Log out</button>
+  </nav>
+</div></header>
+<main>
+  <div id="loginView" class="loginbox card" style="display:none">
+    <h1>Super admin sign in</h1>
+    <p class="sub">Sign in with your super admin phone number and password.</p>
+    <div class="msg" id="loginMsg"></div>
+    <form id="loginForm">
+      <label for="phone">Phone number</label>
+      <input id="phone" type="tel" autocomplete="username" placeholder="+233..." required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <div style="margin-top:16px"><button class="btn" type="submit" style="width:100%">Sign in</button></div>
+    </form>
+    <p class="muted" id="apiOverrideBox" style="margin-top:14px">API base: <span id="apiBaseLabel"></span><br>
+    <label for="apiOverride">Override API base (optional)</label>
+    <input id="apiOverride" type="url" placeholder="http://localhost:4180">
+    <button class="btn ghost small" id="saveApiBtn" type="button" style="margin-top:8px">Save API base</button></p>
+  </div>
+
+  <!-- Super-admin-only gate -->
+  <div id="gateView" class="card" style="display:none;max-width:560px;margin:40px auto;text-align:center">
+    <h1>Super admin only</h1>
+    <p class="sub" id="gateText">This portal is reserved for super admins.</p>
+    <a class="btn" href="/admin.html" style="display:inline-block;text-decoration:none">Go to the Admin portal</a>
+    <a class="btn ghost" href="/index.html" style="display:inline-block;text-decoration:none;margin-left:8px">Player site</a>
+  </div>
+
+  <div id="appView" style="display:none">
+    <h1>Super Admin</h1>
+    <p class="sub" id="roleLine"></p>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="users">Users</button>
+      <button class="tab" data-tab="withdrawals">Withdrawals</button>
+      <button class="tab" data-tab="invites">Invites</button>
+      <button class="tab" data-tab="settings">Settings</button>
+      <button class="tab" data-tab="espn">ESPN Sync</button>
+      <button class="tab" data-tab="platform">Platform</button>
+    </div>
+    <div class="msg" id="globalMsg"></div>
+
+    <section class="panel active" id="panel-dashboard">
+      <div class="card"><h2>Platform dashboard</h2>
+        <button class="btn" id="statsReload">Refresh stats</button>
+        <div id="statsOut" style="margin-top:14px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-users">
+      <div class="card"><h2>Users</h2>
+        <div class="grid"><div><label for="userSearch">Search by phone</label><input id="userSearch" type="search" placeholder="e.g. 233..."></div>
+        <div><label>&nbsp;</label><button class="btn" id="usersReload">Search</button></div></div>
+        <div id="usersOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+      <div class="card" id="userDetail" style="display:none">
+        <h2 id="detailTitle">User detail</h2>
+        <div id="detailOut"></div>
+        <h3 style="margin-top:18px">Balance edit</h3>
+        <p class="sub">Signed amounts: positive credits the wallet, negative debits it. A reason is required and is recorded in the audit log.</p>
+        <form id="balanceForm"><div class="grid">
+          <div><label for="balBucket">Bucket</label><select id="balBucket"><option value="main">Main (withdrawable)</option><option value="bonus">Bonus (stake-only)</option></select></div>
+          <div><label for="balAmount">Amount (GH₵, signed)</label><input id="balAmount" type="number" step="0.01" required></div>
+          <div><label for="balReason">Reason</label><input id="balReason" placeholder="e.g. Goodwill credit" required></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn" type="submit">Apply balance edit</button></div></form>
+        <div class="msg" id="balMsg"></div>
+        <h3 style="margin-top:18px">Account actions</h3>
+        <div class="rowbtns">
+          <button class="btn" id="blockBtn">Block user</button>
+          <select id="roleSelect" style="width:auto"><option value="player">player</option><option value="admin">admin</option><option value="super_admin">super_admin</option></select>
+          <button class="btn" id="roleBtn">Change role</button>
+          <button class="btn danger" id="deleteBtn">Delete user</button>
+        </div>
+        <div class="msg" id="userActionMsg"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-withdrawals">
+      <div class="card"><h2>Withdrawal queue</h2>
+        <p class="sub">Pending withdrawal requests only. Confirming a withdrawal debits the player's main wallet. Only super admins can decide withdrawals.</p>
+        <button class="btn" id="wdReload">Refresh withdrawals</button>
+        <div id="wdOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-invites">
+      <div class="card"><h2>Mint admin invite</h2>
+        <form id="inviteForm"><div class="grid">
+          <div><label for="invRole">Role to grant</label><select id="invRole"><option value="admin">admin</option><option value="super_admin">super_admin</option></select></div>
+          <div><label for="invHours">Valid for (hours, 1–168)</label><input id="invHours" type="number" min="1" max="168" value="48"></div>
+        </div>
+        <div style="margin-top:14px"><button class="btn" type="submit">Mint invite</button></div></form>
+        <div class="msg" id="inviteMsg"></div>
+        <div id="inviteLinkBox" style="display:none"><p class="sub">Share this link — registering through it grants the invited role:</p>
+        <div class="linkbox" id="inviteLink"></div>
+        <button class="btn ghost small" id="copyInviteBtn" type="button">Copy link</button></div>
+      </div>
+      <div class="card"><h2>Existing invites</h2>
+        <button class="btn" id="invitesReload">Refresh invites</button>
+        <div id="invitesOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-settings">
+      <div class="card"><h2>Platform settings</h2>
+        <p class="sub">All values are validated against the backend ranges — out-of-range values are rejected with bad_setting.</p>
+        <form id="settingsForm"><div id="settingsOut"><p class="muted">Loading…</p></div>
+        <div style="margin-top:16px"><button class="btn" type="submit">Save settings</button></div></form>
+        <div class="msg" id="settingsMsg"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-espn">
+      <div class="card"><h2>ESPN sync</h2>
+        <p class="sub">Pulls the latest fixtures and scores from ESPN (keyless) and auto-settles finished matches. Super admin only.</p>
+        <button class="btn" id="espnRun">Run ESPN sync now</button>
+        <div class="msg" id="espnMsg"></div>
+        <div id="espnOut" style="margin-top:12px"></div>
+      </div>
+      <div class="card"><h2>Matches</h2>
+        <button class="btn" id="espnMatchesReload">Refresh matches</button>
+        <div id="espnMatchesOut" style="margin-top:12px"><p class="muted">Loading…</p></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-platform">
+      <div class="card"><h2>Platform</h2>
+        <p><a class="btn" href="/admin.html" style="text-decoration:none;display:inline-block">Open Admin portal</a>
+        <a class="btn ghost" href="/index.html" style="text-decoration:none;display:inline-block;margin-left:8px">Open player site</a></p>
+        <p class="sub">API base: <span id="platformApi"></span></p>
+        <p><button class="btn ghost" id="healthBtn" type="button">Check API health</button></p>
+        <div class="msg" id="healthMsg"></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+(function(){
+'use strict';
+var API_DEFAULT = 'https://blazebet-api.vercel.app';
+// F-M1: portal override is scoped to 'bb_api_admin' (never the player site's
+// 'bb_api' key) and validated — https only, or http only for localhost.
+// An invalid/stale value is ignored, never silently redirecting the portal.
+function validApiBase(v) {
+  if (!v || typeof v !== 'string') return false;
+  try {
+    var u = new URL(v.trim());
+    if (u.protocol === 'https:') return true;
+    if (u.protocol === 'http:') return u.hostname === 'localhost' || u.hostname === '127.0.0.1' || u.hostname === '[::1]';
+  } catch (e) { return false; }
+  return false;
+}
+function isDebug() { try { return /[?&]debug=1/.test(location.search); } catch (e) { return false; } }
+var API = (function () {
+  try { var o = localStorage.getItem('bb_api_admin'); if (o && validApiBase(o)) return o.replace(/\/$/, ''); } catch (e) {}
+  if (window.BB_API && validApiBase(String(window.BB_API))) return String(window.BB_API).replace(/\/$/, '');
+  return API_DEFAULT;
+})();
+var token = localStorage.getItem('bb_token') || '';
+var me = null;
+var currentUser = null;
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function money(n){ var v=Number(n); if(!isFinite(v)) return 'GH₵ —'; return 'GH₵ ' + v.toLocaleString('en-GH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function showMsg(el, kind, text){ el.className='msg '+kind; el.textContent=text; }
+function globalMsg(kind, text){ showMsg($('globalMsg'), kind, text); }
+var API_TIMEOUT_MS = 18000; // F-H5: ~18s fetch timeout
+// F-H1: never throws — network failure / timeout returns {ok:false,status:0}
+// like bb-app.js, so boot() and every loader can show an error instead of a
+// blank page. F-H5: AbortController timeout.
+async function api(method, path, body){
+  var ctrl=null, timer=null;
+  try {
+    if (typeof AbortController !== 'undefined') { ctrl=new AbortController(); timer=setTimeout(function(){ ctrl.abort(); }, API_TIMEOUT_MS); }
+    var opts={method:method,headers:{'Content-Type':'application/json'}};
+    if(token) opts.headers.Authorization='Bearer '+token;
+    if(body!==undefined) opts.body=JSON.stringify(body);
+    if(ctrl) opts.signal=ctrl.signal;
+    var res=await fetch(API+path,opts);
+    if(timer) clearTimeout(timer);
+    var data={}; try{ data=await res.json(); }catch(e){}
+    return {ok:res.ok,status:res.status,data:data};
+  } catch (e) {
+    if(timer) clearTimeout(timer);
+    var timedOut = e && (e.name==='AbortError' || e.name==='TimeoutError');
+    return {ok:false,status:0,data:{error: timedOut ? 'request_timeout' : 'network_error', message: timedOut ? 'The request timed out. Check your connection and try again.' : 'Could not reach the BlazeBet server.'}};
+  }
+}
+function needLogin(){
+  // F-L6: the API-override input is hidden by default; only ?debug=1 shows it.
+  var ob=$('apiOverrideBox'); if(ob) ob.style.display=isDebug()?'':'none';
+  $('loginView').style.display='block'; $('appView').style.display='none'; $('gateView').style.display='none'; $('apiBaseLabel').textContent=API; $('apiOverride').value=localStorage.getItem('bb_api_admin')||'';
+}
+function showGate(){
+  $('loginView').style.display='none'; $('appView').style.display='none'; $('gateView').style.display='block';
+  $('userChip').style.display='inline-block'; $('userChip').textContent=me.phone+' · '+me.role;
+  $('logoutBtn').style.display='inline-block';
+  $('gateText').textContent='You are signed in as '+me.phone+' with role "'+me.role+'". This portal is reserved for super admins.';
+}
+function showApp(){
+  $('loginView').style.display='none'; $('gateView').style.display='none'; $('appView').style.display='block';
+  $('userChip').style.display='inline-block'; $('userChip').textContent=me.phone+' · '+me.role;
+  $('logoutBtn').style.display='inline-block';
+  $('roleLine').textContent='Signed in as '+me.phone+' (super_admin).';
+  $('platformApi').textContent=API;
+  loadStats(); loadUsers(); loadWithdrawals(); loadInvites(); loadSettings(); loadEspnMatches();
+}
+async function boot(){
+  if(!token){ needLogin(); return; }
+  var r=await api('GET','/api/me');
+  // F-H1: unreachable API (status 0) shows the login view + an error instead
+  // of a blank page, and keeps the token (it may still be valid).
+  if(r.status===0){ needLogin(); showMsg($('loginMsg'),'err','Could not reach the BlazeBet server (API base: '+API+'). Check your connection and try again.'); return; }
+  if(!r.ok){ localStorage.removeItem('bb_token'); token=''; needLogin(); showMsg($('loginMsg'),'err','Session expired — please sign in again.'); return; }
+  me=r.data.user;
+  if(me.role!=='super_admin'){ showGate(); return; }
+  showApp();
+}
+$('logoutBtn').addEventListener('click',function(){
+  // F-H6: server-side logout (Phase 2 endpoint). Fire-and-forget with
+  // keepalive; a 404/absence is tolerated — the token is cleared regardless.
+  try { fetch(API+'/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json','Authorization':token?'Bearer '+token:''},body:'{}',keepalive:true}).catch(function(){}); } catch (e) {}
+  localStorage.removeItem('bb_token'); location.reload();
+});
+$('saveApiBtn').addEventListener('click',function(){
+  var v=$('apiOverride').value.trim();
+  if(v && !validApiBase(v)){ showMsg($('loginMsg'),'err','That API base is not valid — use https, or http only for localhost.'); return; }
+  if(v){ localStorage.setItem('bb_api_admin',v); } else { localStorage.removeItem('bb_api_admin'); }
+  location.reload();
+});
+$('loginForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var btn=e.target.querySelector('button[type=submit]'); btn.disabled=true;
+  var r;
+  try { r=await api('POST','/api/auth/login',{phone:$('phone').value.trim(),password:$('password').value}); }
+  finally { btn.disabled=false; }
+  if(!r.ok){ showMsg($('loginMsg'),'err','Sign in failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  token=r.data.token; localStorage.setItem('bb_token',token); me=r.data.user;
+  if(me.role!=='super_admin'){ showGate(); } else { showApp(); }
+});
+$('tabs').addEventListener('click',function(e){
+  var b=e.target.closest('.tab'); if(!b) return;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  b.classList.add('active');
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  $('panel-'+b.dataset.tab).classList.add('active');
+});
+// Dashboard
+async function loadStats(){
+  var r=await api('GET','/api/admin/stats');
+  if(!r.ok){ $('statsOut').innerHTML='<p class="muted">Could not load stats: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var d=r.data;
+  $('statsOut').innerHTML='<div class="statgrid">'
+    +'<div class="stat"><div class="v">'+esc(d.users)+'</div><div class="k">Users</div></div>'
+    +'<div class="stat"><div class="v">'+esc(d.openBets)+'</div><div class="k">Open bets</div></div>'
+    +'<div class="stat"><div class="v">'+esc(d.pendingRequests)+'</div><div class="k">Pending requests</div></div>'
+    +'<div class="stat"><div class="v">'+money(d.betStakes)+'</div><div class="k">Sports stakes (settled)</div></div>'
+    +'<div class="stat"><div class="v">'+money(d.betPayouts)+'</div><div class="k">Sports payouts</div></div>'
+    +'<div class="stat"><div class="v">'+money(d.casinoStakes)+'</div><div class="k">Casino stakes</div></div>'
+    +'<div class="stat"><div class="v">'+money(d.casinoPayouts)+'</div><div class="k">Casino payouts</div></div>'
+    +'<div class="stat"><div class="v">'+money(d.ggr)+'</div><div class="k">Gross gaming revenue</div></div>'
+    +'</div>';
+}
+$('statsReload').addEventListener('click',loadStats);
+// Users
+async function loadUsers(){
+  var q=$('userSearch').value.trim();
+  var r=await api('GET','/api/admin/users'+(q?'?q='+encodeURIComponent(q):''));
+  if(!r.ok){ $('usersOut').innerHTML='<p class="muted">Could not load users: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var users=r.data.users||[];
+  if(!users.length){ $('usersOut').innerHTML='<p class="muted">No users found.</p>'; return; }
+  var html='<div class="tblwrap"><table><tr><th>ID</th><th>Phone</th><th>Name</th><th>Role</th><th>Status</th><th>Main</th><th>Bonus</th><th>Joined</th></tr>';
+  users.forEach(function(u){
+    html+='<tr class="userrow" data-uid="'+u.id+'"><td>'+esc(u.id)+'</td><td><b>'+esc(u.phone)+'</b></td><td>'+esc(u.name||'')+'</td><td><span class="badge '+(u.role==='super_admin'?'green':u.role==='admin'?'':'grey')+'">'+esc(u.role)+'</span></td><td>'+esc(u.status)+'</td><td class="money">'+money(u.main)+'</td><td class="money">'+money(u.bonus)+'</td><td>'+esc((u.created_at||'').slice(0,10))+'</td></tr>';
+  });
+  html+='</table></div><p class="muted">Click a row to open the user detail.</p>';
+  $('usersOut').innerHTML=html;
+}
+$('usersReload').addEventListener('click',loadUsers);
+$('userSearch').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); loadUsers(); } });
+$('usersOut').addEventListener('click',function(e){
+  var tr=e.target.closest('tr[data-uid]'); if(!tr) return;
+  loadUserDetail(tr.dataset.uid);
+});
+async function loadUserDetail(id){
+  var r=await api('GET','/api/admin/users/'+id);
+  if(!r.ok){ globalMsg('err','Could not load user #'+id+': '+(r.data.error||('HTTP '+r.status))); return; }
+  var u=r.data.user; currentUser=u;
+  $('userDetail').style.display='block';
+  $('detailTitle').textContent='User #'+u.id+' — '+u.phone;
+  $('roleSelect').value=u.role;
+  $('blockBtn').textContent=u.status==='blocked'?'Unblock user':'Block user';
+  var html='<p><b>Role:</b> '+esc(u.role)+' · <b>Status:</b> '+esc(u.status)+' · <b>Name:</b> '+esc(u.name||'—')+' · <b>Ref code:</b> '+esc(u.ref_code||'—')+' · <b>Referred by:</b> '+esc(u.referred_by||'—')+' · <b>Joined:</b> '+esc((u.created_at||'').slice(0,19).replace('T',' '))+'</p>'
+    +'<p><b>Main balance:</b> <span class="money">'+money(u.main)+'</span> &nbsp; <b>Bonus balance:</b> <span class="money">'+money(u.bonus)+'</span></p>';
+  var tx=r.data.transactions||[];
+  html+='<h3>Recent transactions</h3>';
+  if(!tx.length) html+='<p class="muted">No transactions yet.</p>';
+  else { html+='<div class="tblwrap"><table><tr><th>Bucket</th><th>Kind</th><th>Amount</th><th>Ref</th><th>When</th></tr>';
+    tx.forEach(function(t){ html+='<tr><td>'+esc(t.bucket)+'</td><td>'+esc(t.kind)+'</td><td class="money">'+money(t.amount)+'</td><td>'+esc(t.ref||'')+'</td><td>'+esc((t.created_at||'').slice(0,19).replace('T',' '))+'</td></tr>'; });
+    html+='</table></div>'; }
+  var bets=r.data.bets||[];
+  html+='<h3 style="margin-top:16px">Recent bets</h3>';
+  if(!bets.length) html+='<p class="muted">No bets yet.</p>';
+  else { html+='<div class="tblwrap"><table><tr><th>ID</th><th>Code</th><th>Stake</th><th>Potential</th><th>Payout</th><th>Status</th></tr>';
+    bets.forEach(function(b){ html+='<tr><td>'+esc(b.id)+'</td><td>'+esc(b.code||'')+'</td><td class="money">'+money(b.stake_minor/100)+'</td><td class="money">'+money(b.potential_minor/100)+'</td><td class="money">'+(b.payout_minor==null?'—':money(b.payout_minor/100))+'</td><td>'+esc(b.status)+'</td></tr>'; });
+    html+='</table></div>'; }
+  $('detailOut').innerHTML=html;
+  $('userDetail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('balanceForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(!currentUser){ showMsg($('balMsg'),'err','Pick a user first.'); return; }
+  var r=await api('POST','/api/admin/users/'+currentUser.id+'/balance',{bucket:$('balBucket').value,amount:parseFloat($('balAmount').value),reason:$('balReason').value.trim()});
+  if(!r.ok){ showMsg($('balMsg'),'err','Balance edit failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('balMsg'),'ok','Balance updated — main '+money(r.data.main)+', bonus '+money(r.data.bonus)+'.');
+  loadUserDetail(currentUser.id); loadUsers();
+});
+$('blockBtn').addEventListener('click',async function(){
+  if(!currentUser) return;
+  var blocking=currentUser.status!=='blocked';
+  var r=await api('POST','/api/admin/users/'+currentUser.id+'/block',{blocked:blocking});
+  if(!r.ok){ showMsg($('userActionMsg'),'err','Block toggle failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('userActionMsg'),'ok','User #'+currentUser.id+' is now '+r.data.status+'.');
+  loadUserDetail(currentUser.id); loadUsers();
+});
+$('roleBtn').addEventListener('click',async function(){
+  if(!currentUser) return;
+  // F-M6: role changes (incl. instant promotion to super_admin) ask first.
+  if(!confirm('Change user #'+currentUser.id+' ('+currentUser.phone+') role to "'+$('roleSelect').value+'"?')) return;
+  var r=await api('POST','/api/admin/users/'+currentUser.id+'/role',{role:$('roleSelect').value});
+  if(!r.ok){ showMsg($('userActionMsg'),'err','Role change failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('userActionMsg'),'ok','User #'+currentUser.id+' is now '+r.data.role+'.');
+  loadUserDetail(currentUser.id); loadUsers();
+});
+$('deleteBtn').addEventListener('click',async function(){
+  if(!currentUser) return;
+  if(!confirm('Delete user #'+currentUser.id+' ('+currentUser.phone+')? This only works with zero balances and no open bets.')) return;
+  var r=await api('DELETE','/api/admin/users/'+currentUser.id);
+  if(!r.ok){ showMsg($('userActionMsg'),'err','Delete failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  showMsg($('userActionMsg'),'ok','User #'+currentUser.id+' deleted.');
+  $('userDetail').style.display='none'; currentUser=null; loadUsers(); loadStats();
+});
+// Withdrawals
+async function loadWithdrawals(){
+  var r=await api('GET','/api/admin/queue');
+  if(!r.ok){ $('wdOut').innerHTML='<p class="muted">Could not load queue: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var reqs=(r.data.requests||[]).filter(function(x){return x.type==='withdrawal';});
+  if(!reqs.length){ $('wdOut').innerHTML='<p class="muted">No pending withdrawals.</p>'; return; }
+  // F-H2: super admin must see where to send the money — bank, account
+  // number and account name columns (server-side filtering for regular
+  // admins lands in Phase 2; this panel is super-admin only).
+  var html='<div class="tblwrap"><table><tr><th>ID</th><th>User</th><th>Amount</th><th>Method</th><th>Bank</th><th>Account number</th><th>Account name</th><th>Requested</th><th>Action</th></tr>';
+  reqs.forEach(function(x){
+    html+='<tr><td>'+esc(x.id)+'</td><td>'+esc(x.user_id)+'</td><td class="money">'+money(x.amount)+'</td><td>'+esc(x.method||'')+'</td><td>'+esc(x.bank||'')+'</td><td>'+esc(x.account_number||x.accountNumber||'')+'</td><td>'+esc(x.account_name||x.accountName||'')+'</td><td>'+esc((x.created_at||'').slice(0,19).replace('T',' '))+'</td><td><div class="rowbtns"><button class="btn small" data-q="'+x.id+'" data-a="confirm">Confirm</button><button class="btn small danger" data-q="'+x.id+'" data-a="reject">Reject</button></div></td></tr>';
+  });
+  html+='</table></div>';
+  $('wdOut').innerHTML=html;
+}
+$('wdReload').addEventListener('click',loadWithdrawals);
+$('wdOut').addEventListener('click',async function(e){
+  var b=e.target.closest('button[data-q]'); if(!b) return;
+  // F-M6: confirming/rejecting a withdrawal moves real money — ask first.
+  if(!confirm((b.dataset.a==='confirm'?'Confirm':'Reject')+' withdrawal #'+b.dataset.q+'?')) return;
+  b.disabled=true;
+  var r=await api('POST','/api/admin/queue/'+b.dataset.q,{action:b.dataset.a});
+  if(r.ok){ globalMsg('ok','Withdrawal #'+b.dataset.q+' '+b.dataset.a+'ed.'); loadWithdrawals(); loadStats(); }
+  else { globalMsg('err','Could not '+b.dataset.a+' withdrawal #'+b.dataset.q+': '+(r.data.error||('HTTP '+r.status))); b.disabled=false; }
+});
+// Invites
+$('inviteForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var r=await api('POST','/api/admin/invites',{role:$('invRole').value,hours:parseInt($('invHours').value,10)||48});
+  if(!r.ok){ showMsg($('inviteMsg'),'err','Mint failed: '+(r.data.error||('HTTP '+r.status))); return; }
+  // F-B2: invite links go to /gh/signup/ (same pattern as referral links
+  // /gh/signup/?ref=) — the login page used to drop ?admin_invite=.
+  var link=location.origin+'/gh/signup/?admin_invite='+encodeURIComponent(r.data.token);
+  showMsg($('inviteMsg'),'ok','Invite minted for role "'+$('invRole').value+'", valid '+r.data.expiresInHours+'h.');
+  $('inviteLink').textContent=link;
+  $('inviteLinkBox').style.display='block';
+  loadInvites();
+});
+$('copyInviteBtn').addEventListener('click',function(){
+  var t=$('inviteLink').textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ globalMsg('ok','Invite link copied.'); }); }
+  else { globalMsg('info','Copy this link: '+t); }
+});
+async function loadInvites(){
+  var r=await api('GET','/api/admin/invites');
+  if(!r.ok){ $('invitesOut').innerHTML='<p class="muted">Could not load invites: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var inv=r.data.invites||[];
+  if(!inv.length){ $('invitesOut').innerHTML='<p class="muted">No invites yet.</p>'; return; }
+  var now=Date.now();
+  var html='<div class="tblwrap"><table><tr><th>Token</th><th>Role</th><th>Created</th><th>Expires</th><th>State</th></tr>';
+  inv.forEach(function(v){
+    var expired=new Date(v.expires_at).getTime()<now;
+    var state=v.used_by?'Used by #'+v.used_by:expired?'Expired':'Unused';
+    html+='<tr><td style="word-break:break-all">'+esc(v.token)+'</td><td>'+esc(v.role)+'</td><td>'+esc((v.created_at||'').slice(0,19).replace('T',' '))+'</td><td>'+esc((v.expires_at||'').slice(0,19).replace('T',' '))+'</td><td><span class="badge '+(v.used_by?'green':expired?'red':'')+'">'+esc(state)+'</span></td></tr>';
+  });
+  html+='</table></div>';
+  $('invitesOut').innerHTML=html;
+}
+$('invitesReload').addEventListener('click',loadInvites);
+// Settings
+var SETTING_META=[
+  ['book_margin','Book margin (fraction)',0,0.30,0.01,0.06],
+  ['cashout_margin','Cashout margin (fraction)',0,0.50,0.01,0.10],
+  ['casino_min_ghs','Casino min stake (GH₵)',0.1,100,0.1,1],
+  ['casino_max_ghs','Casino max stake (GH₵)',10,100000,1,1000],
+  ['min_stake_ghs','Min sports stake (GH₵)',0.1,1000,0.1,1],
+  ['max_payout_ghs','Max payout (GH₵)',1000,10000000,1,200000],
+  ['welcome_bonus_ghs','Welcome bonus on registration (GH₵)',0,10000,1,0],
+  ['commission_pct','First-deposit commission (%)',0,100,1,5],
+  ['maintenance','Maintenance mode (0 off / 1 on)',0,1,1,0],
+  ['registration_open','Registration open (0 closed / 1 open)',0,1,1,1]
+];
+async function loadSettings(){
+  var r=await api('GET','/api/admin/settings');
+  if(!r.ok){ $('settingsOut').innerHTML='<p class="muted">Could not load settings: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return; }
+  var s=r.data.settings||{};
+  if(s.maintenance!=null) lastMaintenance=Number(s.maintenance)===1?1:0;
+  $('settingsOut').innerHTML=SETTING_META.map(function(m){
+    // Backend returns null for keys never set; show the effective default
+    // (same defaults the server uses) so the form never submits NaN.
+    var v=s[m[0]]; if(v==null) v=m[5];
+    if(m[0]==='maintenance'||m[0]==='registration_open'){
+      return '<div><label><input type="checkbox" data-set="'+m[0]+'"'+(Number(v)===1?' checked':'')+'> '+esc(m[1])+'</label></div>';
+    }
+    return '<div><label for="set-'+m[0]+'">'+esc(m[1])+' — range '+m[2]+' to '+m[3]+'</label><input id="set-'+m[0]+'" type="number" step="'+m[4]+'" min="'+m[2]+'" max="'+m[3]+'" value="'+esc(v)+'" data-set="'+m[0]+'"></div>';
+  }).join('');
+}
+var lastMaintenance=0; // F-M6: confirm turning maintenance ON (takes the site down for players)
+$('settingsForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var settings={};
+  document.querySelectorAll('#settingsOut [data-set]').forEach(function(el){
+    if(el.type==='checkbox') settings[el.dataset.set]=el.checked?1:0;
+    else { var v=parseFloat(el.value); if(isFinite(v)) settings[el.dataset.set]=v; }
+  });
+  if(settings.maintenance===1 && lastMaintenance!==1){
+    if(!confirm('Turn maintenance mode ON? This takes the whole site down for players.')) return;
+  }
+  var r=await api('POST','/api/admin/settings',{settings:settings});
+  if(!r.ok){ showMsg($('settingsMsg'),'err','Save failed: '+(r.data.error||('HTTP '+r.status))+(r.data.key?' (key: '+r.data.key+')':'')); return; }
+  lastMaintenance=settings.maintenance===1?1:0;
+  showMsg($('settingsMsg'),'ok','Settings saved.');
+  loadSettings();
+});
+// ESPN sync
+async function loadEspnMatches(){
+  var r=await api('GET','/api/admin/matches');
+  if(!r.ok){
+    if(r.status===404){
+      $('espnMatchesOut').innerHTML='<div class="msg info" style="display:block">GET /api/admin/matches is not available yet on this backend — showing the public upcoming list instead.</div>';
+      var pub=await api('GET','/api/matches');
+      if(pub.ok) renderEspnMatches(pub.data.matches||[]);
+      else $('espnMatchesOut').innerHTML+='<p class="muted">Public list also failed: '+esc(pub.data.error||('HTTP '+pub.status))+'</p>';
+      return;
+    }
+    $('espnMatchesOut').innerHTML='<p class="muted">Could not load matches: '+esc(r.data.error||('HTTP '+r.status))+'</p>'; return;
+  }
+  renderEspnMatches(r.data.matches||[]);
+}
+function renderEspnMatches(list){
+  if(!list.length){ $('espnMatchesOut').innerHTML+='<p class="muted">No matches found.</p>'; return; }
+  var html='<div class="tblwrap"><table><tr><th>ID</th><th>League</th><th>Match</th><th>Kickoff</th><th>Status</th><th>Score</th></tr>';
+  list.forEach(function(m){
+    html+='<tr><td>'+esc(m.id)+'</td><td>'+esc(m.league||'')+'</td><td><b>'+esc(m.home)+'</b> vs <b>'+esc(m.away)+'</b></td><td>'+esc((m.starts_at||'').slice(0,16).replace('T',' '))+'</td><td>'+esc(m.status||'upcoming')+'</td><td>'+(m.home_score!=null?esc(m.home_score)+'–'+esc(m.away_score):'—')+'</td></tr>';
+  });
+  html+='</table></div>';
+  $('espnMatchesOut').innerHTML=html;
+}
+$('espnMatchesReload').addEventListener('click',loadEspnMatches);
+$('espnRun').addEventListener('click',async function(){
+  var btn=$('espnRun'); btn.disabled=true; showMsg($('espnMsg'),'info','Running ESPN sync…');
+  var r=await api('POST','/api/admin/espn-sync',{});
+  btn.disabled=false;
+  if(!r.ok){
+    if(r.status===404) showMsg($('espnMsg'),'info','ESPN sync is not available yet on this backend (route not added). Try again after the backend update lands.');
+    else showMsg($('espnMsg'),'err','ESPN sync failed: '+(r.data.error||('HTTP '+r.status)));
+    return;
+  }
+  var d=r.data;
+  showMsg($('espnMsg'),'ok','Sync complete — imported '+d.imported+', updated '+d.updated+', settled '+d.settled+', live '+d.live+'.');
+  $('espnOut').innerHTML='<div class="statgrid"><div class="stat"><div class="v">'+esc(d.imported)+'</div><div class="k">Imported</div></div><div class="stat"><div class="v">'+esc(d.updated)+'</div><div class="k">Updated</div></div><div class="stat"><div class="v">'+esc(d.settled)+'</div><div class="k">Settled</div></div><div class="stat"><div class="v">'+esc(d.live)+'</div><div class="k">Live</div></div></div>';
+  loadEspnMatches(); loadStats();
+});
+// Platform
+$('healthBtn').addEventListener('click',async function(){
+  var r=await api('GET','/health');
+  if(r.ok) showMsg($('healthMsg'),'ok','API healthy — service '+esc(r.data.service||'')+', db '+esc(r.data.db||'')+'.');
+  else showMsg($('healthMsg'),'err','Health check failed: HTTP '+r.status);
+});
+boot();
+})();
+</script>
+</body>
+</html>

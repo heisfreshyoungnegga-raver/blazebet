@@ -1,22 +1,189 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Baccarat | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/baccarat.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/baccarat.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Baccarat</h1><p class="sub">Player vs Banker, closest to 9 wins. Tie pays 9.00x.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="stage"><div class="row" style="font-size:20px;gap:20px"><span>Player<br><b class="big" id="pc" style="font-size:34px">-</b></span><span>Banker<br><b class="big" id="bc" style="font-size:34px">-</b></span></div><div class="msg" id="msg">Place your bet and deal.</div></div></div>
-<div class="panel row"><select id="pick"><option value="player">Player (2.00x)</option><option value="banker">Banker (1.95x)</option><option value="tie">Tie (9.00x)</option></select></div>
-<button class="bet" onclick="play()">DEAL</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baccarat — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.hands{display:flex;gap:14px;width:100%;justify-content:center}
+.hand{flex:1;max-width:250px;text-align:center}
+.hand-name{font-size:12px;font-weight:800;letter-spacing:.1em;color:#9db9dd;text-transform:uppercase;margin-bottom:8px}
+.hand-name b{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:50%;background:#16407e;color:#fff;font-size:16px;margin-left:6px;padding:0 7px;vertical-align:middle}
+.hand.win .hand-name{color:#86efac}
+.hand.win .hand-name b{background:#16a34a}
+.hand .gk-card{width:54px;height:78px}
+.hand .gk-card .r{font-size:17px}
+.pick-row{display:flex;gap:8px;flex-wrap:wrap}
+.pick-row .gk-chip{flex:1;min-width:96px}
+.pick-row .gk-chip:disabled{opacity:.45;cursor:default}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Baccarat</h1>
+  <p class="gk-sub">Real punto banco: naturals stand, and the full third-card table decides the draws. Hand points are the total mod 10. Player pays &times;2, Banker &times;1.95, Tie &times;9 &mdash; a tie pushes Player and Banker bets.</p>
+
+  <section class="gk-stage has-photo" id="stage">
+    <img class="bg" src="/casino-img/baccarat.jpg" alt="">
+    <div class="gk-stage-in">
+      <div class="hands">
+        <div class="hand" id="handP">
+          <div class="hand-name">Player <b id="totP">&ndash;</b></div>
+          <div class="gk-cards" id="cardsP"></div>
+        </div>
+        <div class="hand" id="handB">
+          <div class="hand-name">Banker <b id="totB">&ndash;</b></div>
+          <div class="gk-cards" id="cardsB"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your bet</div>
+    <div class="pick-row" id="pickRow">
+      <button class="gk-chip on" data-pick="player">Player &middot; &times;2</button>
+      <button class="gk-chip" data-pick="banker">Banker &middot; &times;1.95</button>
+      <button class="gk-chip" data-pick="tie">Tie &middot; &times;9</button>
+    </div>
+    <div class="gk-label" style="margin-top:14px">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Pick a side and deal.</div>
+    <button class="gk-bet" id="gkAction">DEAL</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-function hand(){let v=(1+Math.floor(Math.random()*13));v=Math.min(v,10);let t=v;if(Math.random()<0.45){let v2=(1+Math.floor(Math.random()*13));t+=Math.min(v2,10)}return t%10}
-function play(){const s=getStake();if(!s)return;const p=hand(),b=hand();$('pc').textContent=p;$('bc').textContent=b;
-const res=p>b?'player':(b>p?'banker':'tie');const pick=$('pick').value;
-if(pick==res)settle(s,res=='tie'?9:(res=='banker'?1.95:2),'Player '+p+' vs Banker '+b+' - '+res+' wins!','');else{bal-=s;say('Player '+p+' vs Banker '+b+' - '+res+' wins.','lose');render()}}
-</script></body></html>
+(function () {
+  "use strict";
+  var MULT = { player: 2, banker: 1.95, tie: 9 };
+  var NAMES = { player: "Player", banker: "Banker", tie: "Tie" };
+  var pick = "player", busy = false;
+
+  function pt(r) {
+    if (r === "A") return 1;
+    if (r === "10" || r === "J" || r === "Q" || r === "K") return 0;
+    return parseInt(r, 10);
+  }
+  function total(hand) {
+    var s = 0;
+    hand.forEach(function (c) { s += pt(c.r); });
+    return s % 10;
+  }
+  function cardEl(c) {
+    var d = document.createElement("div");
+    d.innerHTML = BB.cardHTML(c.r, c.s);
+    var el = d.firstChild;
+    el.classList.add("deal");
+    return el;
+  }
+  function appendCard(hand, idx, boxId, totId) {
+    document.getElementById(boxId).appendChild(cardEl(hand[idx]));
+    document.getElementById(totId).textContent = total(hand.slice(0, idx + 1));
+  }
+  function bankerDraws(bTot, v) {
+    if (bTot <= 2) return true;
+    if (bTot === 3) return v !== 8;
+    if (bTot === 4) return v >= 2 && v <= 7;
+    if (bTot === 5) return v >= 4 && v <= 7;
+    if (bTot === 6) return v === 6 || v === 7;
+    return false;
+  }
+  function setPicks(disabled) {
+    document.querySelectorAll("#pickRow .gk-chip").forEach(function (b) { b.disabled = disabled; });
+  }
+  document.querySelectorAll("#pickRow .gk-chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      pick = b.getAttribute("data-pick");
+      document.querySelectorAll("#pickRow .gk-chip").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+  });
+
+  function deal() {
+    if (busy) return;
+    var stake = BB.placeBet();
+    if (!stake) return;
+    busy = true;
+    var btn = document.getElementById("gkAction");
+    btn.disabled = true;
+    setPicks(true);
+    document.getElementById("cardsP").innerHTML = "";
+    document.getElementById("cardsB").innerHTML = "";
+    document.getElementById("totP").innerHTML = "&ndash;";
+    document.getElementById("totB").innerHTML = "&ndash;";
+    document.getElementById("handP").classList.remove("win");
+    document.getElementById("handB").classList.remove("win");
+    BB.msg("Dealing\u2026");
+
+    var deck = BB.newDeck();
+    var P = [deck.pop()], B = [deck.pop()];
+    P.push(deck.pop()); B.push(deck.pop());
+    var order = [["P", 0], ["B", 0], ["P", 1], ["B", 1]];
+    var pTot = total(P), bTot = total(B);
+    if (pTot < 8 && bTot < 8) { // no naturals: third-card rules apply
+      var pThird = null;
+      if (pTot <= 5) { pThird = deck.pop(); P.push(pThird); order.push(["P", 2]); }
+      if (pThird === null) {
+        if (total(B) <= 5) { B.push(deck.pop()); order.push(["B", 2]); }
+      } else if (bankerDraws(total(B), pt(pThird.r))) {
+        B.push(deck.pop()); order.push(["B", 2]);
+      }
+    }
+
+    var i = 0;
+    function step() {
+      if (i < order.length) {
+        var o = order[i++];
+        if (o[0] === "P") appendCard(P, o[1], "cardsP", "totP");
+        else appendCard(B, o[1], "cardsB", "totB");
+        setTimeout(step, 300);
+      } else {
+        setTimeout(function () { settle(stake, P, B); }, 250);
+      }
+    }
+    step();
+  }
+
+  function settle(stake, P, B) {
+    var pT = total(P), bT = total(B);
+    var winner = pT > bT ? "player" : (bT > pT ? "banker" : "tie");
+    if (winner === "player") document.getElementById("handP").classList.add("win");
+    if (winner === "banker") document.getElementById("handB").classList.add("win");
+    var score = "Player " + pT + " \u2013 Banker " + bT + ". ";
+    if (winner === pick) {
+      var win = BB.settle(stake, MULT[pick]);
+      BB.msg(score + NAMES[pick] + " lands \u2014 you won GH\u20B5" + BB.fmt(win) + ".", "win");
+      BB.history("P" + pT + " B" + bT + " +" + BB.fmt(win), "w");
+      BB.burst(document.getElementById("stage"));
+    } else if (winner === "tie") {
+      BB.credit(stake);
+      BB.msg(score + "It is a tie \u2014 your stake is returned.", "");
+      BB.history("P" + pT + " B" + bT + " push", "");
+    } else {
+      BB.msg(score + NAMES[winner] + " takes it \u2014 your " + NAMES[pick] + " bet misses.", "lose");
+      BB.history("P" + pT + " B" + bT + " -" + BB.fmt(stake), "l");
+    }
+    busy = false;
+    document.getElementById("gkAction").disabled = false;
+    setPicks(false);
+    BB.render();
+  }
+
+  document.getElementById("gkAction").addEventListener("click", deal);
+})();
+</script>
+</body>
+</html>

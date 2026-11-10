@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grand Wheel — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.wheel-wrap{position:relative;width:280px;height:280px;margin:16px auto 6px}
+.wheel{width:100%;height:100%;border-radius:50%;background:conic-gradient(from -9deg, #8c2f39 0deg 18deg,#f5c542 18deg 36deg,#8c2f39 36deg 54deg,#e63329 54deg 72deg,#8c2f39 72deg 90deg,#0ea5e9 90deg 108deg,#f97316 108deg 126deg,#8c2f39 126deg 144deg,#0b63e5 144deg 162deg,#8c2f39 162deg 180deg,#16a34a 180deg 198deg,#8c2f39 198deg 216deg,#7c3aed 216deg 234deg,#0ea5e9 234deg 252deg,#8c2f39 252deg 270deg,#334155 270deg 288deg,#8c2f39 288deg 306deg,#f5c542 306deg 324deg,#8c2f39 324deg 342deg,#e63329 342deg 360deg);box-shadow:0 0 0 8px #0a1f44,0 0 0 12px #f5c542,0 18px 40px #0008;position:relative}
+.pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:22px solid #f5c542;z-index:3;filter:drop-shadow(0 3px 3px #0008)}
+.hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;background:#0a1f44;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;text-align:center;border:3px solid #f5c542;z-index:2}
+.seg-label{position:absolute;top:50%;left:50%;font-weight:800;font-size:13px;color:#fff;text-shadow:0 1px 3px #000a}
+.payline{font-size:13px;color:#dbeafe;text-align:center;padding:8px 14px 16px}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Grand Wheel</h1>
+  <p class="gk-sub">Twenty grand segments.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #b45309, #292524)"><div class="wheel-wrap"><div class="pointer"></div><div class="wheel" id="wheel"><span class="seg-label" style="transform:rotate(9deg) translateY(-118px) rotate(-9deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(27deg) translateY(-118px) rotate(-27deg) translate(-50%,-50%)">&times;1.5</span><span class="seg-label" style="transform:rotate(45deg) translateY(-118px) rotate(-45deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(63deg) translateY(-118px) rotate(-63deg) translate(-50%,-50%)">&times;2</span><span class="seg-label" style="transform:rotate(81deg) translateY(-118px) rotate(-81deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(99deg) translateY(-118px) rotate(-99deg) translate(-50%,-50%)">&times;1.2</span><span class="seg-label" style="transform:rotate(117deg) translateY(-118px) rotate(-117deg) translate(-50%,-50%)">&times;2.5</span><span class="seg-label" style="transform:rotate(135deg) translateY(-118px) rotate(-135deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(153deg) translateY(-118px) rotate(-153deg) translate(-50%,-50%)">&times;1.5</span><span class="seg-label" style="transform:rotate(171deg) translateY(-118px) rotate(-171deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(189deg) translateY(-118px) rotate(-189deg) translate(-50%,-50%)">&times;2</span><span class="seg-label" style="transform:rotate(207deg) translateY(-118px) rotate(-207deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(225deg) translateY(-118px) rotate(-225deg) translate(-50%,-50%)">&times;1.2</span><span class="seg-label" style="transform:rotate(243deg) translateY(-118px) rotate(-243deg) translate(-50%,-50%)">&times;3</span><span class="seg-label" style="transform:rotate(261deg) translateY(-118px) rotate(-261deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(279deg) translateY(-118px) rotate(-279deg) translate(-50%,-50%)">&times;1.5</span><span class="seg-label" style="transform:rotate(297deg) translateY(-118px) rotate(-297deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(315deg) translateY(-118px) rotate(-315deg) translate(-50%,-50%)">&times;2</span><span class="seg-label" style="transform:rotate(333deg) translateY(-118px) rotate(-333deg) translate(-50%,-50%)">&times;0</span><span class="seg-label" style="transform:rotate(351deg) translateY(-118px) rotate(-351deg) translate(-50%,-50%)">&times;0.6</span><div class="hub">Grand<br>Wheel</div></div></div><div class="payline">One segment is drawn fairly and the wheel lands on it.</div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">The wheel lands on one fair segment.</div>
+    <button class="gk-bet" id="gkAction">SPIN WHEEL</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var SEGS = [0,1.5,0,2,0,1.2,2.5,0,1.5,0,2,0,1.2,3,0,1.5,0,2,0,0.6];
+  var N = SEGS.length, wheel = document.getElementById("wheel"), btn = document.getElementById("gkAction");
+  var rot = 0, busy = false;
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    var idx = BB.rand(N), mult = SEGS[idx];
+    var segA = 360 / N;
+    var target = 360 * 5 - (idx + 0.5) * segA;
+    var final = rot + (target - (rot % 360)) + 360 * Math.ceil((rot - target) / 360 + 1) * 0 + (360 * 5) + ((target - rot) % 360 + 360) % 360;
+    final = rot - (rot % 360) + 360 * 5 + ((target % 360) + 360) % 360;
+    if (final <= rot) final += 360;
+    var anim = wheel.animate([{ transform: "rotate(" + rot + "deg)" }, { transform: "rotate(" + final + "deg)" }],
+      { duration: 3400, easing: "cubic-bezier(.12,.6,.08,1)", fill: "forwards" });
+    anim.onfinish = function () {
+      rot = final % 360; wheel.style.transform = "rotate(" + rot + "deg)";
+      var win = BB.settle(stake, mult);
+      if (mult > 1) { BB.msg("Segment \u00D7" + mult + " \u2014 you won GH\u20B5" + BB.fmt(win) + ".", "win"); BB.history("\u00D7" + mult + " +" + BB.fmt(win - stake), "w"); if (mult >= 5) BB.burst(document.getElementById("stage")); }
+      else if (mult === 1) { BB.msg("Segment \u00D71 \u2014 stake back.", ""); BB.history("\u00D71 push", ""); }
+      else if (mult > 0) { BB.msg("Segment \u00D7" + mult + " \u2014 GH\u20B5" + BB.fmt(win) + " back.", "lose"); BB.history("\u00D7" + mult + " -" + BB.fmt(stake - win), "l"); }
+      else { BB.msg("Dead segment \u2014 no payout.", "lose"); BB.history("-" + BB.fmt(stake), "l"); }
+      busy = false; btn.disabled = false; BB.render();
+    };
+  });
+})();
+</script>
+</body>
+</html>

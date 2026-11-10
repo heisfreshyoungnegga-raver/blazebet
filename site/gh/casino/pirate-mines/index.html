@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pirate Mines — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:16px;max-width:340px;margin:0 auto}
+.mtile{aspect-ratio:1;border:0;border-radius:12px;background:linear-gradient(160deg,#2e8cff,#0b63e5);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px #0005;padding:0}
+.mtile img{width:62%;height:62%;object-fit:contain;pointer-events:none}
+.mtile.safe{background:#0f3d22;outline:2px solid #22c55e}
+.mtile.mine{background:#4c0519;outline:2px solid #ef4444}
+.mtile:disabled{cursor:default;opacity:.92}
+.mstats{display:flex;gap:8px;justify-content:center;padding:0 12px 14px;flex-wrap:wrap}
+.mstat{background:#ffffff1c;border:1px solid #ffffff2e;color:#dbeafe;border-radius:10px;padding:6px 10px;font-size:12.5px;font-weight:700}
+.mstat b{color:#fff}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Pirate Mines</h1>
+  <p class="gk-sub">4×4 grid hiding 3 mines. Every gem raises the multiplier — cash out anytime.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #7c2d12, #1c0a00)"><div class="mstats"><span class="mstat">Mines <b>3</b></span><span class="mstat">Gems <b id="stGems">0</b></span><span class="mstat">Now <b id="stMult">&times;1.00</b></span><span class="mstat">Next <b id="stNext">&mdash;</b></span></div><div class="mgrid" id="grid"></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Tap tiles to find gems. One mine ends it.</div>
+    <button class="gk-bet" id="gkAction">START ROUND</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var COLS = 4, ROWS = 4, TOTAL = 16, MINES = 3;
+  var grid = document.getElementById("grid"), btn = document.getElementById("gkAction");
+  var inRound = false, stake = 0, mines = new Set(), found = 0, tiles = [];
+  function comb(n, k) { if (k < 0 || k > n) return 1; var r = 1; for (var i = 0; i < k; i++) r = r * (n - i) / (i + 1); return r; }
+  function multAt(k) { return Math.floor(0.97 * comb(TOTAL, k) / comb(TOTAL - MINES, k) * 100) / 100; }
+  function build() {
+    grid.innerHTML = ""; tiles = [];
+    for (var i = 0; i < TOTAL; i++) {
+      var b = document.createElement("button");
+      b.className = "mtile"; b.type = "button"; b.disabled = true;
+      b.setAttribute("aria-label", "Tile " + (i + 1));
+      (function (idx, el) { el.addEventListener("click", function () { reveal(idx, el); }); })(i, b);
+      grid.appendChild(b); tiles.push(b);
+    }
+  }
+  function stats() {
+    document.getElementById("stGems").textContent = found;
+    document.getElementById("stMult").innerHTML = "&times;" + multAt(found).toFixed(2);
+    document.getElementById("stNext").innerHTML = inRound && found < TOTAL - MINES ? "&times;" + multAt(found + 1).toFixed(2) : "&mdash;";
+  }
+  function reveal(idx, el) {
+    if (!inRound || el.disabled) return;
+    el.disabled = true;
+    if (mines.has(idx)) {
+      el.className = "mtile mine";
+      el.innerHTML = '<svg viewBox="0 0 24 24" width="60%" height="60%"><circle cx="12" cy="13" r="7" fill="#1f2937"/><path d="M12 6V3M8 8L5.5 5.5M16 8l2.5-2.5" stroke="#1f2937" stroke-width="2.4" stroke-linecap="round"/><path d="M14.5 4.5l1 1.8 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L1.5 6.6l2-.3z" fill="#f5c542" transform="translate(6 -1) scale(.8)"/></svg>';
+      tiles.forEach(function (t, i) { t.disabled = true; if (mines.has(i) && t !== el) { t.className = "mtile mine"; t.style.opacity = ".55"; } });
+      BB.msg("Mine! The round ends and the stake is gone.", "lose");
+      BB.history("Mine -" + BB.fmt(stake), "l");
+      inRound = false; btn.textContent = "START ROUND"; btn.className = "gk-bet";
+      stats(); BB.render();
+      return;
+    }
+    found++;
+    el.className = "mtile safe";
+    el.innerHTML = '<img alt="" src="/game-img/sym-gem.webp">';
+    if (found >= TOTAL - MINES) { cashOut(); return; }
+    stats();
+    BB.msg("Gem " + found + " \u2014 now \u00D7" + multAt(found).toFixed(2) + ". Cash out or keep going.", "");
+  }
+  function cashOut() {
+    var m = multAt(found), win = BB.settle(stake, m);
+    BB.msg("Cashed out at \u00D7" + m.toFixed(2) + " \u2014 GH\u20B5" + BB.fmt(win) + " banked.", "win");
+    BB.history("\u00D7" + m.toFixed(2) + " +" + BB.fmt(win - stake), "w");
+    BB.burst(document.getElementById("stage"));
+    tiles.forEach(function (t) { t.disabled = true; });
+    inRound = false; btn.textContent = "START ROUND"; btn.className = "gk-bet";
+    stats(); BB.render();
+  }
+  btn.addEventListener("click", function () {
+    if (inRound) { if (found > 0) cashOut(); else BB.msg("Find at least one gem first.", ""); return; }
+    var s = BB.placeBet(); if (!s) return;
+    stake = s; found = 0; mines = new Set();
+    while (mines.size < MINES) mines.add(BB.rand(TOTAL));
+    build();
+    tiles.forEach(function (t) { t.disabled = false; });
+    inRound = true;
+    btn.textContent = "CASH OUT"; btn.className = "gk-bet cash";
+    stats();
+    BB.msg("Round live \u2014 tap tiles to find gems.", "");
+  });
+  build(); stats();
+})();
+</script>
+</body>
+</html>

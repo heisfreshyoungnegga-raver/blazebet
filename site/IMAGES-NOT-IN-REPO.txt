@@ -1,3 +1,6 @@
+# Binary files NOT stored in this repo (push-route limits: text only).
+# Served from the Vercel deployment; the complete bundle is blazebet-site.zip.
+# Count: 186
 ./_next/static/media/apple-pay.986e309d.png
 ./_next/static/media/champions-league.5e333fb3.png
 ./_next/static/media/formula-1.17f942c6.png
@@ -28,14 +31,18 @@
 ./avatars/stadium.webp
 ./avatars/tennis.webp
 ./casino-img/andar.jpg
+./casino-img/aviator.jpg
 ./casino-img/baccarat.jpg
 ./casino-img/balloon.jpg
 ./casino-img/bingo.jpg
 ./casino-img/blackjack.jpg
 ./casino-img/bottle.jpg
+./casino-img/candy.jpg
 ./casino-img/crash.jpg
 ./casino-img/dice.jpg
+./casino-img/dragon.jpg
 ./casino-img/dragontiger.jpg
+./casino-img/egypt.jpg
 ./casino-img/evenodd.jpg
 ./casino-img/flip.jpg
 ./casino-img/fruit.jpg
@@ -44,19 +51,25 @@
 ./casino-img/keno.jpg
 ./casino-img/limbo.jpg
 ./casino-img/mines.jpg
+./casino-img/neon.jpg
 ./casino-img/penalty.jpg
+./casino-img/pirate.jpg
 ./casino-img/plinko.jpg
 ./casino-img/poker.jpg
 ./casino-img/redblack.jpg
+./casino-img/rocket.jpg
 ./casino-img/roulette.jpg
+./casino-img/safari.jpg
 ./casino-img/scratch.jpg
 ./casino-img/sicbo.jpg
 ./casino-img/skyclimb.jpg
 ./casino-img/slots.jpg
 ./casino-img/speedwheel.jpg
+./casino-img/submarine.jpg
 ./casino-img/towers.jpg
 ./casino-img/turbocars.jpg
 ./casino-img/wheel.jpg
+./casino-img/zeus.jpg
 ./casino/blackjack.webp
 ./casino/bottle.webp
 ./casino/crash.webp
@@ -67,6 +80,17 @@
 ./casino/wheel.webp
 ./fonts/proxima-nova-400.woff2
 ./fonts/proxima-nova-700.woff2
+./game-img/roulette-wheel.webp
+./game-img/sym-bell.webp
+./game-img/sym-cherries.webp
+./game-img/sym-diamond.webp
+./game-img/sym-gem.webp
+./game-img/sym-grapes.webp
+./game-img/sym-lemon.webp
+./game-img/sym-orange.webp
+./game-img/sym-seven.webp
+./game-img/sym-star.webp
+./game-img/sym-strawberry.webp
 ./leagues/flags/bo.png
 ./leagues/flags/cl.png
 ./leagues/flags/es.png

@@ -1,20 +1,126 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Fruit Fiesta | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/fruit.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/fruit.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Fruit Fiesta</h1><p class="sub">A fruity 3-reel slot. Three of a kind pays up to 40x, any pair 1.20x.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="stage"><div class="row" id="reels" style="font-size:58px;gap:18px"><span>&#127815;</span><span>&#127819;</span><span>&#127818;</span></div><div class="msg" id="msg">Fresh reels - hit spin.</div></div></div>
-<button class="bet" onclick="play()">SPIN</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fruit Fiesta — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.fruit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(308px,92%)}
+.tile{background:#fdfdf8;border-radius:14px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 3px #0a2c5c,0 8px 18px rgba(0,0,0,.35);overflow:hidden}
+.tile img{width:80%;height:80%;object-fit:contain;pointer-events:none}
+.tile.hot{box-shadow:inset 0 0 0 3px #facc15,0 0 24px rgba(250,204,21,.75);animation:tilepulse .5s ease 2}
+@keyframes tilepulse{50%{transform:scale(1.06)}}
+.fruit-result{font-size:15px;color:#9db9dd;font-weight:700;text-align:center}
+.fruit-result b{display:block;font-size:30px;color:#fff;line-height:1.15}
+.paytable{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Fruit Fiesta</h1>
+  <p class="gk-sub">Nine tiles, five fruits. The spin pays on your single most common fruit &mdash; the more of one kind you land, the bigger the multiplier.</p>
+
+  <section class="gk-stage" id="stage">
+    <div class="fruit-grid" id="grid"></div>
+    <div class="fruit-result">Best catch<b id="result">&ndash;</b></div>
+    <div class="paytable" id="paytable"></div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Stake up and spin the fiesta.</div>
+    <button class="gk-bet" id="gkAction">SPIN</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-const sym=['GR','LM','OR','SB','PN','MG'];const pay={'GR':6,'LM':5,'OR':8,'SB':10,'PN':15,'MG':40};
-function play(){const s=getStake();if(!s)return;const r=[0,0,0].map(()=>sym[Math.floor(Math.random()*sym.length)]);$('reels').innerHTML=r.map(x=>'<span>'+x+'</span>').join('');
-if(r[0]==r[1]&&r[1]==r[2])settle(s,pay[r[0]],'THREE OF A KIND!','');else if(r[0]==r[1]||r[1]==r[2]||r[0]==r[2])settle(s,1.2,'A juicy pair - small win.','');else{bal-=s;say('No match - spin again.','lose');render()}}
-</script></body></html>
+(function () {
+  var FRUITS = [
+    { id: "cherries", name: "Cherries", img: "/game-img/sym-cherries.webp" },
+    { id: "lemon", name: "Lemons", img: "/game-img/sym-lemon.webp" },
+    { id: "strawberry", name: "Strawberries", img: "/game-img/sym-strawberry.webp" },
+    { id: "grapes", name: "Grapes", img: "/game-img/sym-grapes.webp" },
+    { id: "orange", name: "Oranges", img: "/game-img/sym-orange.webp" }
+  ];
+  var PAYS = { 3: 2, 4: 4, 5: 8, 6: 15, 7: 30, 8: 60, 9: 150 };
+  var grid = document.getElementById("grid");
+  var resultEl = document.getElementById("result");
+  var btn = document.getElementById("gkAction");
+  var tiles = [], spinning = false;
+
+  for (var i = 0; i < 9; i++) {
+    var t = document.createElement("div");
+    t.className = "tile";
+    t.innerHTML = '<img src="' + FRUITS[i % FRUITS.length].img + '" alt="">';
+    grid.appendChild(t);
+    tiles.push(t);
+  }
+  document.getElementById("paytable").innerHTML = Object.keys(PAYS).map(function (n) {
+    return '<span class="gk-hist">' + n + " of a fruit &times;" + PAYS[n] + "</span>";
+  }).join("");
+
+  function setTile(i, f) { tiles[i].innerHTML = '<img src="' + f.img + '" alt="">'; }
+  function drawRandom() { return FRUITS[BB.rand(FRUITS.length)]; }
+
+  function spin() {
+    if (spinning) return;
+    var stake = BB.placeBet();
+    if (!stake) return;
+    spinning = true;
+    btn.disabled = true;
+    tiles.forEach(function (t) { t.classList.remove("hot"); });
+    resultEl.textContent = "\u2026";
+    BB.msg("Fiesta spinning\u2026");
+    var ticks = 0;
+    var iv = setInterval(function () {
+      for (var i = 0; i < 9; i++) setTile(i, drawRandom());
+      if (++ticks >= 10) {
+        clearInterval(iv);
+        settle(stake);
+      }
+    }, 70);
+  }
+
+  function settle(stake) {
+    var final = [];
+    for (var i = 0; i < 9; i++) { var f = drawRandom(); final.push(f); setTile(i, f); }
+    var counts = {}, best = null, bestN = 0;
+    final.forEach(function (f) {
+      counts[f.id] = (counts[f.id] || 0) + 1;
+      if (counts[f.id] > bestN) { bestN = counts[f.id]; best = f; }
+    });
+    var mult = PAYS[bestN] || 0;
+    spinning = false;
+    btn.disabled = false;
+    if (mult > 0) {
+      final.forEach(function (f, i) { if (f.id === best.id) tiles[i].classList.add("hot"); });
+      var win = BB.settle(stake, mult);
+      resultEl.textContent = bestN + " \u00D7 " + best.name + " \u2014 \u00D7" + mult;
+      BB.msg(bestN + " " + best.name + "! You won GH\u20B5" + BB.fmt(win) + (mult >= 30 ? " \u2014 fiesta jackpot!" : ""), "win");
+      BB.history(bestN + " " + best.name + " +" + BB.fmt(win), "w");
+      BB.burst(document.getElementById("stage"));
+    } else {
+      resultEl.textContent = "Best: " + bestN + " \u00D7 " + best.name;
+      BB.msg("Only " + bestN + " " + best.name + " \u2014 you need 3 of a fruit to cash.", "lose");
+      BB.history(bestN + " " + best.name + " -" + BB.fmt(stake), "l");
+    }
+    BB.render();
+  }
+  btn.addEventListener("click", spin);
+})();
+</script>
+</body>
+</html>

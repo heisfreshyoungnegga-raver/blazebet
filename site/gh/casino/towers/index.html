@@ -1,25 +1,196 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Towers | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/towers.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/towers.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Towers</h1><p class="sub">Climb 5 floors. One safe tile per floor - one wrong pick ends the climb.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="grid" id="tower" style="grid-template-columns:repeat(3,1fr)"></div><div class="msg" id="msg" style="margin-top:10px">Start a climb, pick one tile per floor.</div><div id="streak" style="color:#ffb02e;font-weight:700"></div></div>
-<div class="row"><button class="ghost" onclick="cash()">Cash out</button></div><br>
-<button class="bet" onclick="start()">START CLIMB</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Towers — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.tower{display:flex;flex-direction:column;gap:7px;width:100%}
+.trow{display:flex;gap:7px;align-items:center;padding:4px 6px;border-radius:12px}
+.trow.now{background:rgba(46,140,255,.13);box-shadow:inset 0 0 0 1px rgba(46,140,255,.45)}
+.tmult{width:52px;flex:none;text-align:right;font-size:12px;font-weight:800;color:#9db9dd}
+.trow.now .tmult{color:#fff}
+.ttile{flex:1;height:46px;border-radius:11px;background:#16407e;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;padding:0;transition:background .15s ease,transform .08s ease}
+.ttile:active{transform:scale(.96)}
+.ttile[disabled]{cursor:default;opacity:.55}
+.ttile.safe{background:#14532d;border-color:#22c55e}
+.ttile.bust{background:#7f1d1d;border-color:#ef4444;opacity:1}
+.ttile.dim{opacity:.38}
+.gem{width:19px;height:19px;background:linear-gradient(135deg,#bae6fd,#0284c7);transform:rotate(45deg);border-radius:5px;box-shadow:0 0 12px rgba(125,211,252,.85)}
+.bomb{width:23px;height:23px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#94a3b8,#0f172a 72%);position:relative}
+.bomb::before{content:"";position:absolute;top:-7px;left:55%;width:3px;height:8px;background:#94a3b8;transform:rotate(24deg)}
+.bomb::after{content:"";position:absolute;top:-12px;left:calc(55% + 5px);width:6px;height:6px;border-radius:50%;background:#f59e0b;box-shadow:0 0 7px #f59e0b}
+.floor-note{font-size:13px;color:#cfe2ff;font-weight:700}
+.cash-info{font-size:13px;color:#9db9dd;font-weight:700;text-align:center;margin-top:8px}
+.cash-info b{color:#86efac}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Towers</h1>
+  <p class="gk-sub">Eight floors, three tiles each &mdash; and one bomb hiding on every floor. Pick a safe tile to climb: each floor cleared grows your payout. Cash out whenever you like, but one bomb ends the climb.</p>
+
+  <section class="gk-stage has-photo" id="stage">
+    <img class="bg" src="/casino-img/towers.jpg" alt="" aria-hidden="true">
+    <div class="gk-stage-in">
+      <div class="tower" id="tower"></div>
+      <div class="floor-note" id="floorNote">Press START CLIMB to play</div>
+    </div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">One bomb per floor. Climb carefully.</div>
+    <button class="gk-bet" id="gkAction">START CLIMB</button>
+    <button class="gk-bet cash" id="gkCash" style="display:none;margin-top:10px">CASH OUT</button>
+    <div class="cash-info" id="cashInfo"></div>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Bomb positions are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-let floor=0,stake0=0,active=false,bombs=[];
-function build(){const tw=$('tower');tw.innerHTML='';for(let f=4;f>=0;f--){for(let c=0;c<3;c++){const b=document.createElement('button');b.className='cell';b.textContent='Floor '+(f+1);b.dataset.f=f;b.dataset.c=c;b.onclick=()=>pick(b,f,c);tw.appendChild(b)}}}
-function start(){const s=getStake();if(!s)return;stake0=s;floor=0;active=true;bombs=Array.from({length:5},()=>Math.floor(Math.random()*3));build();$('streak').textContent='Multiplier: 1.00x';say('Climb! Pick a tile on Floor 1.','')}
-function pick(b,f,c){if(!active||f!=floor)return;if(c==bombs[f]){b.classList.add('miss');b.textContent='\u{1F4A3}';bal-=stake0;active=false;say('Bomb on Floor '+(f+1)+' - climb over.','lose');render();return}
-b.classList.add('hit');b.textContent='\u2713';floor++;const mult=1+floor*0.55;$('streak').textContent=floor>=5?'Top floor!':'Multiplier: '+mult.toFixed(2)+'x';if(floor>=5){active=false;settle(stake0,mult,'You topped the tower!','')}else say('Safe! On to Floor '+(floor+1)+'.','win')}
-function cash(){if(!active||floor==0){say('Climb at least one floor first.','lose');return}active=false;settle(stake0,1+floor*0.55,'Cashed out from Floor '+floor+'.','')}
-build();
-</script></body></html>
+(function () {
+  var MULTS = [1.46, 2.12, 3.08, 4.48, 6.52, 9.49, 13.81, 20.09];
+  var active = false, stakeP = 0, cur = 0, bombs = [], revealed = [], bustedFloor = -1;
+
+  function render() {
+    var box = document.getElementById("tower");
+    box.innerHTML = "";
+    for (var f = 7; f >= 0; f--) {
+      var row = document.createElement("div");
+      row.className = "trow" + (active && f === cur ? " now" : "");
+      var lab = document.createElement("span");
+      lab.className = "tmult";
+      lab.textContent = "\u00D7" + MULTS[f].toFixed(2);
+      row.appendChild(lab);
+      for (var t = 0; t < 3; t++) {
+        var tile = document.createElement("button");
+        tile.className = "ttile";
+        tile.type = "button";
+        var isRevealed = revealed[f] === t;
+        var isBombShown = (f < cur && bombs[f] === t) || (bustedFloor === f && bombs[f] === t);
+        if (isRevealed) {
+          tile.classList.add("safe");
+          tile.innerHTML = '<span class="gem"></span>';
+          tile.disabled = true;
+        } else if (isBombShown) {
+          tile.classList.add(bustedFloor === f ? "bust" : "dim");
+          tile.innerHTML = '<span class="bomb"></span>';
+          tile.disabled = true;
+        } else if (f < cur) {
+          tile.classList.add("dim");
+          tile.disabled = true;
+        } else if (active && f === cur) {
+          tile.disabled = false;
+        } else {
+          tile.disabled = true;
+        }
+        (function (ff, tt, el) {
+          el.addEventListener("click", function () { pick(ff, tt); });
+        })(f, t, tile);
+        row.appendChild(tile);
+      }
+      box.appendChild(row);
+    }
+    var note = document.getElementById("floorNote");
+    var cash = document.getElementById("gkCash");
+    var info = document.getElementById("cashInfo");
+    if (active) {
+      note.textContent = "Floor " + (cur + 1) + " of 8 \u2014 pick a tile";
+      cash.style.display = "block";
+      if (cur >= 1) {
+        var val = Math.round(stakeP * MULTS[cur - 1]);
+        cash.disabled = false;
+        cash.textContent = "CASH OUT \u2014 GH\u20B5" + BB.fmt(val);
+        info.innerHTML = "Climb value now <b>GH\u20B5" + BB.fmt(val) + "</b> at \u00D7" + MULTS[cur - 1].toFixed(2);
+      } else {
+        cash.disabled = true;
+        cash.textContent = "CASH OUT";
+        info.textContent = "Clear floor 1 to unlock cash out.";
+      }
+    } else {
+      cash.style.display = "none";
+      info.textContent = "";
+      if (!bustedFloor && bustedFloor !== 0) note.textContent = "Press START CLIMB to play";
+    }
+  }
+  function endSession() {
+    active = false;
+    document.getElementById("gkAction").disabled = false;
+    document.getElementById("gkAction").textContent = "START CLIMB";
+    document.getElementById("gkStake").disabled = false;
+    render();
+    BB.render();
+  }
+  function pick(f, t) {
+    if (!active || f !== cur) return;
+    if (bombs[f] === t) {
+      bustedFloor = f;
+      BB.msg("Boom \u2014 floor " + (f + 1) + " was mined. The climb ends and the stake is gone.", "lose");
+      BB.history("Tower F" + f + " -" + BB.fmt(stakeP), "l");
+      document.getElementById("floorNote").textContent = "Bomb on floor " + (f + 1) + " \u2014 climb over";
+      active = false;
+      document.getElementById("gkAction").disabled = false;
+      document.getElementById("gkAction").textContent = "START CLIMB";
+      document.getElementById("gkStake").disabled = false;
+      document.getElementById("gkCash").style.display = "none";
+      render();
+      BB.render();
+      return;
+    }
+    revealed[f] = t;
+    cur++;
+    if (cur >= 8) {
+      var winTop = Math.round(stakeP * MULTS[7]);
+      BB.credit(winTop);
+      BB.msg("Top of the tower! Full climb at \u00D720.09 \u2014 you won GH\u20B5" + BB.fmt(winTop) + ".", "win");
+      BB.history("Tower TOP +" + BB.fmt(winTop), "w");
+      BB.burst(document.getElementById("stage"));
+      document.getElementById("floorNote").textContent = "Summit reached \u2014 full \u00D720.09 paid";
+      endSession();
+      return;
+    }
+    BB.msg("Safe! Floor " + cur + " cleared \u2014 payout now \u00D7" + MULTS[cur - 1].toFixed(2) + ". Climb on or cash out.");
+    render();
+  }
+  function start() {
+    if (active) return;
+    var s = BB.placeBet();
+    if (!s) return;
+    stakeP = s; cur = 0; bustedFloor = -1;
+    bombs = []; revealed = [];
+    for (var f = 0; f < 8; f++) { bombs.push(BB.rand(3)); revealed.push(-1); }
+    active = true;
+    document.getElementById("gkAction").disabled = true;
+    document.getElementById("gkStake").disabled = true;
+    BB.msg("Climb started \u2014 pick a tile on floor 1.");
+    render();
+  }
+  document.getElementById("gkAction").addEventListener("click", start);
+  document.getElementById("gkCash").addEventListener("click", function () {
+    if (!active || cur < 1) return;
+    var win = Math.round(stakeP * MULTS[cur - 1]);
+    BB.credit(win);
+    BB.msg("Cashed out on floor " + cur + " at \u00D7" + MULTS[cur - 1].toFixed(2) + " \u2014 GH\u20B5" + BB.fmt(win) + " banked.", "win");
+    BB.history("Tower F" + cur + " +" + BB.fmt(win), "w");
+    BB.burst(document.getElementById("stage"));
+    document.getElementById("floorNote").textContent = "Cashed out on floor " + cur;
+    endSession();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

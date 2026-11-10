@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limbo Challenge — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.lm-wrap{padding:26px 12px 20px;text-align:center}
+.lm-num{font-size:60px;font-weight:800;letter-spacing:-.03em;color:#fff;text-shadow:0 8px 30px #0007}
+.lm-num.win{color:#86efac}.lm-num.lose{color:#f87171}
+.lm-sub{font-size:13.5px;color:#dbeafe;font-weight:700;margin-top:6px}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Limbo Challenge</h1>
+  <p class="gk-sub">The counter climbs and stops at a fair point. Stop at or past ×3.00 to win ×3.00.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #b45309, #451a03)"><div class="lm-wrap"><div class="lm-num" id="num">1.00&times;</div><div class="lm-sub">Target &times;3.00 &middot; win chance ~32%</div></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Beat the target to win.</div>
+    <button class="gk-bet" id="gkAction">LAUNCH</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var TARGET = 3;
+  var num = document.getElementById("num"), btn = document.getElementById("gkAction");
+  var busy = false;
+  function crashPoint() { var r = Math.random(); if (r < 0.03) return 1.00; return Math.min(500, Math.floor((0.97 / (1 - r)) * 100) / 100); }
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    num.className = "lm-num";
+    var result = crashPoint(), t0 = performance.now(), DUR = 850;
+    (function tick() {
+      var p = Math.min(1, (performance.now() - t0) / DUR);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var shown = 1 + (result - 1) * eased;
+      num.textContent = shown.toFixed(2) + "\u00D7";
+      if (p < 1) { requestAnimationFrame(tick); return; }
+      var win = BB.settle(stake, result >= TARGET ? TARGET : 0);
+      if (result >= TARGET) {
+        num.classList.add("win");
+        BB.msg("Stopped at \u00D7" + result.toFixed(2) + " \u2014 past your \u00D7" + TARGET.toFixed(2) + " target. You won GH\u20B5" + BB.fmt(win) + ".", "win");
+        BB.history("\u00D7" + result.toFixed(2) + " win", "w");
+        BB.burst(document.getElementById("stage"));
+      } else {
+        num.classList.add("lose");
+        BB.msg("Stopped at \u00D7" + result.toFixed(2) + " \u2014 short of \u00D7" + TARGET.toFixed(2) + ". Stake lost.", "lose");
+        BB.history("\u00D7" + result.toFixed(2) + " -" + BB.fmt(stake), "l");
+      }
+      busy = false; btn.disabled = false; BB.render();
+    })();
+  });
+})();
+</script>
+</body>
+</html>

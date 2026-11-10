@@ -19,8 +19,7 @@ const { floatStream, crashPoint } = require('../src/crypto');
   assert(winRate > 0.47 && winRate < 0.50, 'P(crash>=2x) ~0.485, got ' + winRate);
   console.log('unit OK - overround', sum.toFixed(3), '| P(crash>=2x)', winRate.toFixed(3), '| capped mean', (total / N).toFixed(2));
   // HTTP flow
-  process.env.PORT = 4199;
-  require('../src/server');
+  require('../src/server').start(4199);
   const base = 'http://127.0.0.1:4199';
   const call = async (m, p, body, tok) => { const r = await fetch(base + p, { method: m, headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) }, body: body ? JSON.stringify(body) : undefined }); return { s: r.status, j: await r.json() }; };
   await new Promise(r => setTimeout(r, 300));

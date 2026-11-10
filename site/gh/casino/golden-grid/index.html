@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Golden Harvest Grid — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.grid9{display:grid;grid-template-columns:repeat(3,74px);gap:8px;justify-content:center;padding:18px 10px 8px}
+.g9{width:74px;height:74px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px #0005}
+.g9 img{width:52px;height:52px;object-fit:contain}
+.g9.win{outline:3px solid #f5c542;animation:pulse .5s ease 2}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.payline{font-size:13px;color:#dbeafe;text-align:center;padding:4px 14px 14px}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Golden Harvest Grid</h1>
+  <p class="gk-sub">Harvest gold — nine matching tiles pay 150x.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #ca8a04, #422006)"><div class="grid9" id="grid"></div><div class="payline">Most of one fruit pays: 3 &times;2 &middot; 4 &times;4 &middot; 5 &times;8 &middot; 6 &times;15 &middot; 7 &times;30 &middot; 8 &times;60 &middot; 9 &times;150</div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Nine tiles land — the most common fruit pays.</div>
+    <button class="gk-bet" id="gkAction">SPIN</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var FRUITS = [{"k":"cherries","img":"/game-img/sym-cherries.webp"},{"k":"lemon","img":"/game-img/sym-lemon.webp"},{"k":"strawberry","img":"/game-img/sym-strawberry.webp"},{"k":"grapes","img":"/game-img/sym-grapes.webp"},{"k":"orange","img":"/game-img/sym-orange.webp"}];
+  var PAYS = {"3":2,"4":4,"5":8,"6":15,"7":30,"8":60,"9":150};
+  var grid = document.getElementById("grid"), btn = document.getElementById("gkAction");
+  var tiles = [];
+  for (var i = 0; i < 9; i++) {
+    var d = document.createElement("div"); d.className = "g9";
+    d.innerHTML = '<img alt="" src="' + FRUITS[i % FRUITS.length].img + '">';
+    grid.appendChild(d); tiles.push(d);
+  }
+  var busy = false;
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    tiles.forEach(function (t) { t.classList.remove("win"); });
+    var final = [], counts = {};
+    for (var i = 0; i < 9; i++) { var f = FRUITS[BB.rand(FRUITS.length)]; final.push(f); counts[f.k] = (counts[f.k] || 0) + 1; }
+    var ticks = 0;
+    var iv = setInterval(function () {
+      tiles.forEach(function (t) { t.innerHTML = '<img alt="" src="' + FRUITS[BB.rand(FRUITS.length)].img + '">'; });
+      if (++ticks >= 10) {
+        clearInterval(iv);
+        tiles.forEach(function (t, i) { t.innerHTML = '<img alt="" src="' + final[i].img + '">'; });
+        var bestK = null, best = 0;
+        Object.keys(counts).forEach(function (k) { if (counts[k] > best) { best = counts[k]; bestK = k; } });
+        var mult = PAYS[best] || 0;
+        if (mult > 0) tiles.forEach(function (t, i) { if (final[i].k === bestK) t.classList.add("win"); });
+        var win = BB.settle(stake, mult);
+        if (mult > 0) {
+          BB.msg(best + " " + bestK + "! You won GH\u20B5" + BB.fmt(win) + ".", "win");
+          BB.history(best + " " + bestK + " \u00D7" + mult, "w");
+          if (mult >= 15) BB.burst(document.getElementById("stage"));
+        } else { BB.msg("Only " + best + " of a kind \u2014 no payout.", "lose"); BB.history("-" + BB.fmt(stake), "l"); }
+        busy = false; btn.disabled = false; BB.render();
+      }
+    }, 70);
+  });
+})();
+</script>
+</body>
+</html>

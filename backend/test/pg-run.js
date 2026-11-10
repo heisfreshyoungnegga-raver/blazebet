@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const { execFileSync } = require('node:child_process');
 const envLocal = fs.readFileSync(__dirname + '/../.env.local', 'utf8');
 const url = envLocal.match(/DATABASE_URL=(\S+)/)[1].replace(/\/[^/?]+(\?|$)/, '/blizbet_test$1');
-const TABLES = ['promo_redemptions','promo_codes','admin_actions','support_messages','admin_invites','game_sessions','casino_rounds','bet_legs','bets','matches','payment_requests','ledger_entries','sessions','settings','users'];
+const TABLES = ['promo_redemptions','promo_codes','admin_actions','support_messages','admin_invites','game_sessions','casino_rounds','bet_legs','bets','matches','payment_requests','ledger_entries','sessions','settings','users','payment_attempts','webhook_events'];
 async function reset() {
   const { Client } = require('pg');
   const c = new Client({ connectionString: url });

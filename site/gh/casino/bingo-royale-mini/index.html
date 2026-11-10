@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bingo Royale Mini — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.bm-wrap{display:flex;flex-direction:column;align-items:center;padding:14px;gap:10px}
+.bm-card{display:grid;grid-template-columns:repeat(5,52px);gap:5px}
+.bm-cell{height:46px;border-radius:9px;background:#123a7a;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+.bm-cell.hit{background:#16a34a}
+.bm-cell.free{background:#f5c542;color:#0a1f44;font-size:11px}
+.bm-ball{font-size:15px;font-weight:800;color:#fff;min-height:22px}
+.bm-called{font-size:12px;color:#9db9dd;max-width:320px;text-align:center;line-height:1.7}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Bingo Royale Mini</h1>
+  <p class="gk-sub">Fast bingo — 30 balls from 75. Finish your line early for up to ×20.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #6d28d9, #1e1b4b)"><div class="bm-wrap"><div class="bm-ball" id="ball">Your card is ready</div><div class="bm-card" id="card"></div><div class="bm-called" id="called"></div></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Your card daubs itself — watch for a line.</div>
+    <button class="gk-bet" id="gkAction">PLAY BINGO</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var POOL = 75, BALLS = 30;
+  var cardEl = document.getElementById("card"), ballEl = document.getElementById("ball"), calledEl = document.getElementById("called");
+  var btn = document.getElementById("gkAction");
+  var card = [], busy = false;
+  function newCard() {
+    var nums = new Set();
+    while (nums.size < 24) nums.add(1 + BB.rand(POOL));
+    card = Array.from(nums);
+    cardEl.innerHTML = "";
+    for (var i = 0; i < 25; i++) {
+      var d = document.createElement("div");
+      if (i === 12) { d.className = "bm-cell free"; d.textContent = "FREE"; }
+      else { d.className = "bm-cell"; d.textContent = card[i < 12 ? i : i - 1]; d.dataset.n = card[i < 12 ? i : i - 1]; }
+      cardEl.appendChild(d);
+    }
+  }
+  function hasLine(hits) {
+    var g = [];
+    for (var i = 0; i < 25; i++) g.push(i === 12 || hits.has(card[i < 12 ? i : i - 1]));
+    for (var r = 0; r < 5; r++) if ([0, 1, 2, 3, 4].every(function (c) { return g[r * 5 + c]; })) return true;
+    for (var c = 0; c < 5; c++) if ([0, 1, 2, 3, 4].every(function (r) { return g[r * 5 + c]; })) return true;
+    if ([0, 6, 12, 18, 24].every(function (i) { return g[i]; })) return true;
+    if ([4, 8, 12, 16, 20].every(function (i) { return g[i]; })) return true;
+    return false;
+  }
+  newCard();
+  btn.addEventListener("click", function () {
+    if (busy) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    busy = true; btn.disabled = true;
+    newCard();
+    var deck = new Set();
+    while (deck.size < BALLS) deck.add(1 + BB.rand(POOL));
+    var order = Array.from(deck), idx = 0, hits = new Set(), called = [];
+    calledEl.textContent = "";
+    var iv = setInterval(function () {
+      var n = order[idx++];
+      called.push(n);
+      ballEl.textContent = "Ball " + idx + " of " + BALLS + ": " + n;
+      calledEl.textContent = called.join(" \u00B7 ");
+      if (card.indexOf(n) >= 0) {
+        hits.add(n);
+        cardEl.querySelectorAll(".bm-cell").forEach(function (c) { if (Number(c.dataset.n) === n) c.classList.add("hit"); });
+      }
+      var won = hasLine(hits);
+      if (won || idx >= BALLS) {
+        clearInterval(iv);
+        var mult = 0;
+        if (won) mult = idx <= 14 ? 20 : idx <= 21 ? 8 : 4;
+        var win = BB.settle(stake, mult);
+        if (won) { ballEl.textContent = "BINGO! Line in " + idx + " balls"; BB.msg("Line in " + idx + " balls \u2014 \u00D7" + mult + "! You won GH\u20B5" + BB.fmt(win) + ".", "win"); BB.history("Bingo \u00D7" + mult, "w"); BB.burst(document.getElementById("stage")); }
+        else { ballEl.textContent = "No line this card"; BB.msg(BALLS + " balls called and no line \u2014 card loses.", "lose"); BB.history("-" + BB.fmt(stake), "l"); }
+        busy = false; btn.disabled = false; BB.render();
+      }
+    }, 380);
+  });
+})();
+</script>
+</body>
+</html>

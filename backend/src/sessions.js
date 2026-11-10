@@ -3,7 +3,20 @@
 // Actions reveal/step through it. Public views never expose hidden layout
 // until the session settles.
 const ZONES = ['Top Left','Top Centre','Top Right','Bottom Left','Bottom Centre','Bottom Right'];
-const LADDER = [1.3, 1.8, 2.6, 3.8, 5.5];
+// B4: each rung steps by ~1.164 = 0.97 x 6/5 (keeper saves 1/6 of shots).
+// LADDER[k] = floor(1.164^(k+1) * 100)/100; top (5 goals) ~x2.13, not x5.5.
+// EV of cashing at rung k = (5/6)^k * LADDER[k-1]: 0.967 / 0.938 / 0.909 / 0.883 / 0.856.
+const LADDER = [1.16, 1.35, 1.57, 1.83, 2.13];
+// B3: Balloon Pop. popAt uniform over 1..13, so EVERY pump can bust
+// (P(pop on pump 1) = 1/13). Per-pump step ratio = 0.97 / P(survive pump k |
+// survived k-1) = 0.97 * (14-k)/(13-k); telescoping gives
+// balloonMult(k) = 0.97^k * 13/(13-k), floored to 2dp, and the EV of the
+// "pump k times then cash" strategy is 0.97^k (< 1 for every k >= 1).
+function balloonMult(pumps) {
+  if (pumps <= 0) return 1;
+  if (pumps >= 13) return 0; // a 13th pump always pops (popAt <= 13)
+  return Math.floor(Math.pow(0.97, pumps) * 13 / (13 - pumps) * 100) / 100;
+}
 function shuffledDeck(f) {
   const deck = [];
   for (let s = 0; s < 4; s++) for (let v = 1; v <= 13; v++) deck.push({ v, s });
@@ -37,7 +50,7 @@ const SESSION_GAMES = {
     start(f, opts) { const count = Math.min(10, Math.max(1, parseInt(opts.mines) || 3));
       const mines = new Set(); while (mines.size < count) mines.add(Math.floor(f() * 25));
       return { mines: [...mines], minesCount: count, picks: [] }; },
-    act(st, a, p) { if (a === 'cashout') return cash(st, minesMult(st.picks.length, st.minesCount), 'Cashed out');
+    act(st, a, p) { if (a === 'cashout') return st.picks.length ? cash(st, minesMult(st.picks.length, st.minesCount), 'Cashed out') : (() => { throw new Error('nothing_to_cash'); })();
       const tile = +p.tile; if (!(tile >= 0 && tile < 25) || st.picks.includes(tile)) throw new Error('bad_tile');
       if (st.mines.includes(tile)) return lose(st, 'Mine hit');
       st.picks.push(tile); st.mult = minesMult(st.picks.length, st.minesCount);
@@ -78,11 +91,11 @@ const SESSION_GAMES = {
       return ok(st); },
     pub(st) { return { last: st.last, multiplier: st.mult, correct: st.correct }; } },
   balloon: { name: 'Balloon Pop',
-    start(f) { return { popAt: 3 + Math.floor(f() * 13), pumps: 0, mult: 1 }; },
+    start(f) { return { popAt: 1 + Math.floor(f() * 13), pumps: 0, mult: 1 }; },
     act(st, a) { if (a === 'cashout') return st.pumps ? cash(st, st.mult, 'Cashed out') : (() => { throw new Error('nothing_to_cash'); })();
       if (a !== 'pump') throw new Error('bad_action');
       st.pumps++; if (st.pumps >= st.popAt) return lose(st, 'Balloon popped');
-      st.mult = Math.floor((1 + 0.25 * st.pumps) * 100) / 100; return ok(st); },
+      st.mult = balloonMult(st.pumps); return ok(st); },
     pub(st, settled) { return { pumps: st.pumps, multiplier: st.mult, ...(settled ? { popAt: st.popAt } : {}) }; } },
   goalladder: { name: 'Goal Ladder',
     start(f) { return { keepers: Array.from({ length: 5 }, () => ZONES[Math.floor(f() * 6)]), goals: 0 }; },
@@ -91,7 +104,7 @@ const SESSION_GAMES = {
       const keeper = st.keepers[st.goals];
       if (keeper === p.zone || (keeper.includes('Centre') && String(p.zone || '').includes('Centre'))) return lose(st, 'Saved by the keeper');
       st.goals++; st.mult = LADDER[st.goals - 1];
-      if (st.goals === 5) return cash(st, 5.5, 'Five from five');
+      if (st.goals === 5) return cash(st, LADDER[4], 'Five from five');
       return ok(st); },
     pub(st, settled) { return { goals: st.goals, nextMult: LADDER[st.goals] || null, ...(settled ? { keepers: st.keepers } : {}) }; } },
   poker: { name: 'Video Poker',
@@ -114,6 +127,47 @@ const SESSION_GAMES = {
 };
 function towerMult(floor) { return Math.floor(Math.pow(1.455, floor) * 100) / 100; }
 function ok(st) { return { settled: false, state: st }; }
-function cash(st, mult, msg) { return { settled: true, won: true, multiplier: Math.max(1, mult), message: msg, state: st }; }
+// H4: NO floor at 1.00 — cash() pays the true multiplier. A sub-1 multiplier
+// is only reachable via a cashout the game itself forbids (Mines/Towers/
+// Hi-Lo/Red-Black/Balloon/Goal Ladder all throw 'nothing_to_cash' with no
+// progress); removing the clamp closes the zero-risk bonus-conversion leak
+// (minesMult(0)=0.97 clamped to 1.00 used to refund the stake to main).
+function cash(st, mult, msg) { return { settled: true, won: true, multiplier: mult, message: msg, state: st }; }
 function lose(st, msg) { return { settled: true, won: false, multiplier: 0, message: msg, state: st }; }
-module.exports = { SESSION_GAMES, evaluatePoker, minesMult, towerMult };
+
+// H6-support — lost-update guard for session actions (Phase 2 wiring).
+// actSessionGuarded(sessionId, fn) runs fn(row) inside ONE db.tx with the
+// session row claimed by a conditional status flip: the UPDATE only touches
+// the row while it is still 'active', and the helper returns the number of
+// rows the guard touched (0 = another request already settled the session —
+// the caller must abort / return 409, NOT credit). Usage in the Phase-2
+// session-action handler (src/server.js POST /api/casino/session/:id/action):
+//   const res = await actSessionGuarded(id, async (row) => {
+//     const out = SESSION_GAMES[row.game].act(JSON.parse(row.state), action, body);
+//     // ... compute payout, wallet.creditWinnings(...), write final state ...
+//     return { out, payout, nextState, nextStatus };
+//   });
+//   if (res.touched === 0) return send(res, 409, { error: 'session_already_settled' });
+// NOTE: db.tx() itself is AREA A's fix (B1 — one PG client per tx); this
+// helper is the status-guard half and is safe on SQLite today. On PG the
+// guard UPDATE is the atomic claim; fn's writes run in the same tx.
+// The guard UPDATE is issued FIRST (claim), fn runs second, so two
+// concurrent actions cannot both compute from the same pre-click snapshot.
+const db = require('./db');
+async function actSessionGuarded(sessionId, fn) {
+  return db.tx(async () => {
+    const row = await db.one("SELECT * FROM game_sessions WHERE id=? AND status='active'", sessionId);
+    if (!row) return { touched: 0, row: null, result: null };
+    // Claim: flip active -> 'acting' so a concurrent action sees no active row.
+    // The flip is reverted/committed by fn's final status write in the same tx;
+    // if fn throws, the tx rolls back and the session stays 'active'.
+    // fn MUST write the session's final status ('active' | 'won' | 'lost')
+    // before returning — otherwise the tx commits with status='acting'.
+    await db.run("UPDATE game_sessions SET status='acting' WHERE id=? AND status='active'", sessionId);
+    const claimed = await db.one("SELECT * FROM game_sessions WHERE id=? AND status='acting'", sessionId);
+    if (!claimed) return { touched: 0, row: null, result: null };
+    const result = await fn(claimed);
+    return { touched: 1, row: claimed, result };
+  });
+}
+module.exports = { SESSION_GAMES, evaluatePoker, minesMult, towerMult, LADDER, balloonMult, actSessionGuarded };

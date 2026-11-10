@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mega Fortune Slots — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.reels{display:flex;gap:10px;justify-content:center;padding:18px 10px}
+.reel{width:86px;height:86px;border-radius:16px;background:#fff;overflow:hidden;position:relative;box-shadow:inset 0 0 0 3px #0b63e533, 0 10px 24px #0006}
+.reel .strip{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column}
+.reel .cell{height:86px;display:flex;align-items:center;justify-content:center}
+.reel .cell img{width:64px;height:64px;object-fit:contain}
+.reel.spin .strip{filter:blur(2px)}
+.payline{font-size:13px;color:#dbeafe;text-align:center;padding:0 14px 14px;line-height:1.7}</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Mega Fortune Slots</h1>
+  <p class="gk-sub">The big one — golden sevens pay 100x.</p>
+  <section class="gk-stage" id="stage" style="background:linear-gradient(160deg, #b45309, #292524)"><div class="reels" id="reels"></div><div class="payline" id="payline"></div></section>
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    
+    <div class="gk-msg" id="gkMsg">Line up three symbols to win.</div>
+    <button class="gk-bet" id="gkAction">SPIN</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
+<script>
+
+(function () {
+  var SYMS = [{"k":"seven","img":"/game-img/sym-seven.webp","w":1,"pay":100},{"k":"diamond","img":"/game-img/sym-diamond.webp","w":2,"pay":40},{"k":"gem","img":"/game-img/sym-gem.webp","w":3,"pay":20},{"k":"bell","img":"/game-img/sym-bell.webp","w":3,"pay":16},{"k":"star","img":"/game-img/sym-star.webp","w":4,"pay":9},{"k":"orange","img":"/game-img/sym-orange.webp","w":5,"pay":4}];
+  var PAIR = 1.8;
+  var reelsEl = document.getElementById("reels"), btn = document.getElementById("gkAction");
+  var pool = [];
+  SYMS.forEach(function (s) { for (var i = 0; i < s.w; i++) pool.push(s); });
+  function drawSym() { return pool[BB.rand(pool.length)]; }
+  var reels = [];
+  for (var r = 0; r < 3; r++) {
+    var d = document.createElement("div"); d.className = "reel";
+    d.innerHTML = '<div class="strip"><div class="cell"><img alt="" src="' + SYMS[r % SYMS.length].img + '"></div></div>';
+    reelsEl.appendChild(d); reels.push(d);
+  }
+  document.getElementById("payline").innerHTML = SYMS.map(function (s) {
+    return "3&times; <b>" + s.k + "</b> pays &times;" + s.pay;
+  }).join(" &middot; ") + " &middot; any pair pays &times;" + PAIR;
+  var spinning = false;
+  btn.addEventListener("click", function () {
+    if (spinning) return;
+    var stake = BB.placeBet(); if (!stake) return;
+    spinning = true; btn.disabled = true;
+    var finals = [drawSym(), drawSym(), drawSym()];
+    var done = 0;
+    reels.forEach(function (reel, i) {
+      var strip = reel.querySelector(".strip");
+      var cells = "";
+      for (var j = 0; j < 12; j++) cells += '<div class="cell"><img alt="" src="' + drawSym().img + '"></div>';
+      cells += '<div class="cell"><img alt="" src="' + finals[i].img + '"></div>';
+      strip.innerHTML = cells;
+      reel.classList.add("spin");
+      var anim = strip.animate(
+        [{ transform: "translateY(0)" }, { transform: "translateY(-" + 12 * 86 + "px)" }],
+        { duration: 700 + i * 350, easing: "cubic-bezier(.15,.6,.25,1)", fill: "forwards" }
+      );
+      anim.onfinish = function () {
+        reel.classList.remove("spin");
+        strip.style.transform = "translateY(-" + 12 * 86 + "px)";
+        if (++done === 3) settle(stake, finals);
+      };
+    });
+  });
+  function settle(stake, f) {
+    spinning = false; btn.disabled = false;
+    var mult = 0, label = "";
+    if (f[0].k === f[1].k && f[1].k === f[2].k) { mult = f[0].pay; label = "Three " + f[0].k + "s!"; }
+    else if (f[0].k === f[1].k || f[1].k === f[2].k || f[0].k === f[2].k) { mult = PAIR; label = "A pair!"; }
+    var win = BB.settle(stake, mult);
+    if (mult > 0) {
+      BB.msg(label + " You won GH\u20B5" + BB.fmt(win) + ".", "win");
+      BB.history("\u00D7" + mult + " +" + BB.fmt(win - stake), "w");
+      if (mult >= 10) BB.burst(document.getElementById("stage"));
+    } else {
+      BB.msg("No match this spin.", "lose");
+      BB.history("-" + BB.fmt(stake), "l");
+    }
+    BB.render();
+  }
+})();
+</script>
+</body>
+</html>

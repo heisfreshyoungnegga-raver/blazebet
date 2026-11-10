@@ -1,24 +1,208 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#211D28"><title>Red-Black Streak | BlazeBet</title><link rel="icon" href="/favicon.svg"><style>*{box-sizing:border-box}body{margin:0;background:#211D28;color:#f4f2f7;font-family:'Segoe UI',system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#2b2633;position:sticky;top:0}header a{color:#c9c2d6;text-decoration:none;font-weight:600}.logo{font-weight:800;letter-spacing:.5px}.logo b{color:#ffb02e}main{max-width:560px;margin:0 auto;padding:18px 14px 40px}h1{font-size:22px;margin:6px 0 2px}.sub{color:#a89fb8;font-size:13px;margin-bottom:14px}.panel{background:#2b2633;border-radius:14px;padding:16px;margin-bottom:14px}.bal{font-size:14px;color:#a89fb8}.bal b{color:#ffb02e;font-size:20px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.chip{background:#3a3444;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}.chip.on{background:#ffb02e;color:#211D28}input[type=number]{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;width:110px;font-size:16px}button.bet{background:#22c55e;color:#06280f;border:0;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:800;cursor:pointer;width:100%}button.ghost{background:#3a3444;color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer}button:disabled{opacity:.45;cursor:default}.stage{background:#1d1924;border-radius:14px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;gap:10px}.big{font-size:52px;font-weight:800}.msg{font-size:16px;min-height:22px}.win{color:#4ade80}.lose{color:#f87171}.grid{display:grid;gap:6px}.cell{background:#3a3444;border:0;color:#fff;border-radius:10px;padding:12px 0;font-weight:700;cursor:pointer;font-size:16px}.cell.sel{background:#ffb02e;color:#211D28}.cell.hit{background:#22c55e}.cell.miss{background:#7f1d1d}.foot{color:#8d84a0;font-size:12px;text-align:center;margin-top:16px}select{background:#1d1924;color:#fff;border:1px solid #453e55;border-radius:10px;padding:10px;font-size:15px}</style><style>body{background:linear-gradient(rgba(5,7,13,.90),rgba(5,7,13,.96)),url('/casino-img/redblack.jpg') center/cover fixed no-repeat,#07090f}.bb-hero{height:170px;border-radius:14px;background:url('/casino-img/redblack.jpg') center/cover;border:1px solid #26314d;margin:0 0 14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}</style></head>
-<body><header><a href="/gh/casino/index.html">&larr; Casino</a><span class="logo">BLIZ<b>BET</b></span></header>
-<main><h1>Red-Black Streak</h1><p class="sub">Call the colour of the next card. Every correct call raises your multiplier - cash out anytime.</p>
-<div class="panel row" style="justify-content:space-between"><span class="bal">Demo balance<br><b id="bal">GH₵ 1,000.00</b></span><span class="row"><input type="number" id="stake" value="10" min="1" step="1"><button class="chip" data-v="1">1</button><button class="chip" data-v="5">5</button><button class="chip" data-v="10">10</button><button class="chip" data-v="50">50</button><button class="chip" data-v="100">100</button></span></div>
-<div class="panel"><div class="stage"><div class="big" id="card">?</div><div class="msg" id="msg">Start, then call red or black.</div><div id="streak" style="color:#ffb02e;font-weight:700"></div></div></div>
-<div class="row"><button class="ghost" style="background:#dc2626" onclick="guess('red')">RED</button><button class="ghost" style="background:#111" onclick="guess('black')">BLACK</button><button class="ghost" onclick="cash()">Cash out</button></div><br>
-<button class="bet" onclick="start()">START STREAK</button>
-<p class="foot">Demo game - plays with fun balance only, no real-money wagering on this static preview. Random outcomes generated in your browser.</p></main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red-Black Streak — BlazeBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/game-kit.css">
+<style>
+.cur-card .gk-card{width:84px;height:120px}
+.cur-card .gk-card .r{font-size:28px;top:8px;left:10px}
+.cur-card .gk-card .s{font-size:19px;top:38px;left:10px}
+.cur-card .gk-card .big-s{font-size:48px}
+.stats{display:flex;gap:8px;width:100%}
+.stat{flex:1;background:#0d3573;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:9px 6px;text-align:center}
+.stat small{display:block;font-size:10px;font-weight:800;letter-spacing:.1em;color:#9db9dd;text-transform:uppercase;margin-bottom:2px}
+.stat b{font-size:17px;color:#fff}
+.stat b.green{color:#86efac}
+.ladder{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;min-height:24px;width:100%}
+.ladder .step{font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;background:#082550;color:#7db4ff;border:1px solid rgba(125,180,255,.35)}
+.ladder .step.latest{background:#2e8cff;color:#fff}
+.ladder .ladder-empty{font-size:12px;color:#64809f;font-weight:700}
+.guess-row{display:flex;gap:8px;margin-bottom:10px}
+.guess-btn{flex:1;color:#fff;border:0;border-radius:12px;padding:15px 8px;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit;min-height:54px;letter-spacing:.05em;transition:transform .1s ease,opacity .15s ease}
+.guess-btn:active:not(:disabled){transform:scale(.97)}
+.guess-btn small{display:block;font-size:12px;font-weight:700;opacity:.85;margin-top:2px;letter-spacing:0}
+.guess-btn:disabled{opacity:.4;cursor:default}
+.rb-red{background:linear-gradient(135deg,#b91c1c,#ef4444);box-shadow:0 10px 22px -10px rgba(220,38,38,.6)}
+.rb-black{background:linear-gradient(135deg,#1f2937,#030712);box-shadow:0 10px 22px -10px rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.22)}
+</style>
+</head>
+<body>
+<header class="gk-head"><a class="gk-back" href="/gh/casino/">&larr; Casino</a><span class="gk-logo">BLAZE<b>BET</b></span><span class="gk-bal">GH&#8373; <b id="gkBal">0.00</b></span></header>
+<main class="gk-main">
+  <h1>Red-Black Streak</h1>
+  <p class="gk-sub">Call the colour of the next card. Every correct call grows your multiplier by the real odds of the cards left in the deck (3% house edge built in) &mdash; one wrong call ends the round. Cash out whenever you like.</p>
+
+  <section class="gk-stage" id="stage">
+    <div class="cur-card" id="curCard"></div>
+    <div class="stats">
+      <div class="stat"><small>Streak</small><b id="stStreak">0</b></div>
+      <div class="stat"><small>Multiplier</small><b id="stMult">&times;1.00</b></div>
+      <div class="stat"><small>Cash out</small><b class="green" id="stCash">GH&#8373; 0.00</b></div>
+    </div>
+    <div class="ladder" id="ladder"><span class="ladder-empty">Your streak ladder builds here</span></div>
+  </section>
+
+  <section class="gk-panel">
+    <div class="gk-label">Your stake (GH&#8373;)</div>
+    <div class="gk-stake-row">
+      <input id="gkStake" type="number" value="10" min="1" step="1" inputmode="decimal">
+      <button class="gk-chip" data-chip="1">1</button><button class="gk-chip" data-chip="5">5</button>
+      <button class="gk-chip" data-chip="10">10</button><button class="gk-chip" data-chip="50">50</button>
+      <button class="gk-chip" data-chip="100">100</button>
+      <button class="gk-chip" id="gkHalf">&frac12;</button><button class="gk-chip" id="gkDouble">2&times;</button>
+    </div>
+    <div class="gk-msg" id="gkMsg">Set your stake and start a round.</div>
+    <button class="gk-bet" id="gkAction">START ROUND</button>
+    <div style="height:10px"></div>
+    <div class="guess-row">
+      <button class="guess-btn rb-red" id="gkRed" disabled>RED<small id="redMult">&times;&ndash;</small></button>
+      <button class="guess-btn rb-black" id="gkBlack" disabled>BLACK<small id="blackMult">&times;&ndash;</small></button>
+    </div>
+    <button class="gk-bet cash" id="gkCash" disabled>CASH OUT</button>
+    <button class="gk-reset" id="gkReset">Top up demo balance to GH&#8373;1,000</button>
+    <div class="gk-history" id="gkHistory"></div>
+  </section>
+  <p class="gk-foot">Demo game &mdash; plays with fun balance only, no real-money wagering on this static preview. Outcomes are generated in your browser.</p>
+</main>
+<script src="/game-kit.js"></script>
 <script>
-let bal=1000;const $=id=>document.getElementById(id);
-function money(n){return 'GH₵ '+n.toFixed(2)}
-function render(){$('bal').textContent=money(bal)}
-function getStake(){const s=parseFloat($('stake').value)||0;if(s<=0||s>bal){say('Enter a stake within your demo balance.','lose');return 0}return s}
-function settle(stake,mult,winMsg,loseMsg){if(mult>0){const w=stake*mult;bal+=w-stake;say(winMsg+' You won '+money(w)+'.','win')}else{bal-=stake;say(loseMsg,'lose')}render()}
-document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('stake').value=c.dataset.v});
-function say(t,c){const m=$('msg');if(m){m.textContent=t;m.className='msg '+(c||'')}}
-render();
-let active=false,mult=1,stake0=0;const names={1:'A',11:'J',12:'Q',13:'K'};const rs=['\u2665','\u2666'],bs=['\u2660','\u2663'];
-function start(){const s=getStake();if(!s)return;stake0=s;mult=1;active=true;$('streak').textContent='Multiplier: 1.00x';say('Call the next card: red or black?','')}
-function guess(col){if(!active){say('Start a streak first.','lose');return}const red=Math.random()<0.5;const v=1+Math.floor(Math.random()*13);$('card').textContent=(names[v]||v)+(red?rs[Math.floor(Math.random()*2)]:bs[Math.floor(Math.random()*2)]);$('card').style.color=red?'#f87171':'#e5e7eb';
-if((col=='red')==red){mult+=0.5;$('streak').textContent='Multiplier: '+mult.toFixed(2)+'x - potential '+money(stake0*mult);say('Correct - it was '+(red?'red':'black')+'! Push the streak or cash out.','win')}
-else{bal-=stake0;active=false;say('It was '+(red?'red':'black')+' - streak over.','lose');render()}}
-function cash(){if(!active||mult<=1){say('Get one call right first.','lose');return}active=false;settle(stake0,mult,'Banked at '+mult.toFixed(2)+'x!','')}
-</script></body></html>
+(function () {
+  "use strict";
+  var round = false, busy = false;
+  var stake = 0, deck = [], current = null, mult = 1, streak = 0;
+
+  var startBtn = document.getElementById("gkAction");
+  var redBtn = document.getElementById("gkRed");
+  var blackBtn = document.getElementById("gkBlack");
+  var cashBtn = document.getElementById("gkCash");
+  var ladderEl = document.getElementById("ladder");
+
+  function isRed(c) { return c.s === "h" || c.s === "d"; }
+  function colourName(c) { return isRed(c) ? "red" : "black"; }
+  function redsLeft() {
+    var n = 0;
+    deck.forEach(function (c) { if (isRed(c)) n++; });
+    return n;
+  }
+  function stepMult(colour) {
+    if (!deck.length) return 0;
+    var k = colour === "red" ? redsLeft() : deck.length - redsLeft();
+    if (!k) return 0;
+    return 0.97 / (k / deck.length);
+  }
+  function showCard(animate) {
+    var box = document.getElementById("curCard");
+    if (!current) { box.innerHTML = BB.cardHTML("A", "s", true); return; }
+    box.innerHTML = BB.cardHTML(current.r, current.s);
+    if (animate && box.firstChild.animate) {
+      box.firstChild.animate(
+        [{ transform: "rotateY(88deg)", opacity: .3 }, { transform: "rotateY(0deg)", opacity: 1 }],
+        { duration: 300, easing: "ease-out" }
+      );
+    }
+  }
+  function addLadder() {
+    if (streak === 1) ladderEl.innerHTML = "";
+    ladderEl.querySelectorAll(".step").forEach(function (s) { s.classList.remove("latest"); });
+    var s = document.createElement("span");
+    s.className = "step latest";
+    s.textContent = streak + " \u00B7 \u00D7" + mult.toFixed(2);
+    ladderEl.appendChild(s);
+    while (ladderEl.children.length > 14) ladderEl.removeChild(ladderEl.firstChild);
+  }
+  function updateUI() {
+    document.getElementById("stStreak").textContent = streak;
+    document.getElementById("stMult").innerHTML = "&times;" + mult.toFixed(2);
+    document.getElementById("stCash").textContent = round ? "GH\u20B5 " + BB.fmt(Math.round(stake * mult)) : "GH\u20B5 0.00";
+    var sr = round ? stepMult("red") : 0, sb = round ? stepMult("black") : 0;
+    document.getElementById("redMult").innerHTML = !round ? "&times;&ndash;" : (sr ? "&times;" + sr.toFixed(2) + " next" : "none left");
+    document.getElementById("blackMult").innerHTML = !round ? "&times;&ndash;" : (sb ? "&times;" + sb.toFixed(2) + " next" : "none left");
+    redBtn.disabled = !round || busy || !sr;
+    blackBtn.disabled = !round || busy || !sb;
+    cashBtn.disabled = !round || busy;
+    cashBtn.textContent = round ? "CASH OUT GH\u20B5" + BB.fmt(Math.round(stake * mult)) : "CASH OUT";
+    startBtn.disabled = round || busy;
+  }
+  function endRound() {
+    round = false;
+    updateUI(); // last card stays on the felt
+  }
+
+  function start() {
+    if (round || busy) return;
+    var s = BB.placeBet();
+    if (!s) return;
+    stake = s;
+    deck = BB.newDeck();
+    current = deck.pop();
+    mult = 1;
+    streak = 0;
+    round = true;
+    ladderEl.innerHTML = '<span class="ladder-empty">Your streak ladder builds here</span>';
+    showCard(true);
+    BB.msg("First card is " + colourName(current) + ". Call the next one \u2014 red or black?");
+    updateUI();
+  }
+
+  function guess(colour) {
+    if (!round || busy) return;
+    var sm = stepMult(colour);
+    if (!sm) return;
+    busy = true;
+    updateUI();
+    var next = deck.pop();
+    var win = colourName(next) === colour;
+    current = next;
+    showCard(true);
+    setTimeout(function () {
+      busy = false;
+      if (win) {
+        mult *= sm;
+        streak++;
+        addLadder();
+        if (!deck.length) {
+          BB.msg("That was the last card in the deck \u2014 cashing you out.", "win");
+          updateUI();
+          cashOut();
+          return;
+        }
+        BB.msg("Correct \u2014 " + next.r + " is " + colour + ". Streak " + streak + ", cash out is GH\u20B5" + BB.fmt(Math.round(stake * mult)) + ".", "win");
+        updateUI();
+      } else {
+        BB.msg("It came up " + colourName(next) + " \u2014 the streak dies at " + streak + " and the stake is gone.", "lose");
+        BB.history("Streak " + streak + " -" + BB.fmt(stake), "l");
+        endRound();
+      }
+      BB.render();
+    }, 320);
+  }
+
+  function cashOut() {
+    if (!round || busy) return;
+    var amount = Math.round(stake * mult);
+    BB.credit(amount);
+    if (streak > 0) {
+      BB.msg("Cashed out GH\u20B5" + BB.fmt(amount) + " at \u00D7" + mult.toFixed(2) + " after a streak of " + streak + ".", "win");
+      BB.history("Out \u00D7" + mult.toFixed(2) + " +" + BB.fmt(amount), "w");
+      BB.burst(document.getElementById("stage"));
+    } else {
+      BB.msg("Round closed \u2014 stake of GH\u20B5" + BB.fmt(amount) + " returned.", "");
+      BB.history("Out \u00D71.00 stake back", "");
+    }
+    endRound();
+    BB.render();
+  }
+
+  startBtn.addEventListener("click", start);
+  redBtn.addEventListener("click", function () { guess("red"); });
+  blackBtn.addEventListener("click", function () { guess("black"); });
+  cashBtn.addEventListener("click", cashOut);
+  showCard(false);
+  updateUI();
+})();
+</script>
+</body>
+</html>

@@ -8,8 +8,15 @@ function hashPassword(pw) {
 function verifyPassword(pw, stored) {
   const [salt, hash] = String(stored).split(':');
   if (!salt || !hash) return false;
-  const calc = crypto.scryptSync(String(pw), salt, 64);
-  return crypto.timingSafeEqual(calc, Buffer.from(hash, 'hex'));
+  // L2: a malformed stored hash (corrupt/legacy row) used to throw inside
+  // timingSafeEqual when the decoded bytes were not 64 long -> login 500.
+  // Length-check first and return false instead of throwing.
+  let expected;
+  try { expected = Buffer.from(hash, 'hex'); } catch { return false; }
+  if (expected.length !== 64) return false;
+  let calc;
+  try { calc = crypto.scryptSync(String(pw), salt, 64); } catch { return false; }
+  return crypto.timingSafeEqual(calc, expected);
 }
 const newToken = () => crypto.randomBytes(32).toString('hex');
 const sha256 = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
